@@ -1,5 +1,11 @@
 # @jeanne-mas/documentize-preprocessor
 
+## 0.0.3
+
+### Patch Changes
+
+- 381557a: Added missing exports main
+
 ## 0.0.2
 
 ### Patch Changes
