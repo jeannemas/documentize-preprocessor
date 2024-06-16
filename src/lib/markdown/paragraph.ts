@@ -3,17 +3,13 @@ import { Node } from './internal.js';
 export class Paragraph extends Node {
   /**
    * The text of the heading.
-   *
-   * @type {string}
    */
-  #text;
+  #text: string;
 
   /**
    * Create a new heading.
-   *
-   * @param {string} text
    */
-  constructor(text) {
+  constructor(text: string) {
     super();
 
     this.#text = text;

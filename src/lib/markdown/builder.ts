@@ -1,16 +1,10 @@
-import { Container } from './internal.js';
-
-/**
- * @typedef {import('./internal.js').Node} Node
- */
+import { Container, type Node } from './internal.js';
 
 export class Builder extends Container {
   /**
    * Add nodes to the builder.
-   *
-   * @param  {...Node} nodes
    */
-  add(...nodes) {
+  add(...nodes: Node[]) {
     this._nodes.push(...nodes);
 
     return this;

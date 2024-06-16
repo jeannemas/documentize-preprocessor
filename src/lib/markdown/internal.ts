@@ -1,30 +1,22 @@
 export class Node {
   /**
    * Convert the node to a string.
-   *
-   * @returns {string}
    */
-  toString() {
+  toString(): string {
     throw new Error('Not implemented');
   }
 }
 export class Container extends Node {
   /**
    * The nodes in the container.
-   *
-   * @protected
-   * @type {Node[]}
    */
-  _nodes = [];
+  protected _nodes: Node[] = [];
 
   /**
    * Add nodes to the container.
-   *
-   * @param  {...Node} nodes
-   * @returns {this}
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  add(...nodes) {
+  add(...nodes: Node[]): this {
     throw new Error('Not implemented');
   }
 }

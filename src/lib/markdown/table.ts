@@ -1,33 +1,24 @@
 import { Node } from './internal.js';
 
-/**
- * @typedef {{
- * 	align: 'left' | 'right';
- *  text: string;
- * }} TableHeader
- */
+type TableHeader = {
+  align: 'left' | 'right';
+  text: string;
+};
 
 export class Table extends Node {
   /**
    * The headers of the table.
-   *
-   * @type {TableHeader[]}
    */
-  #headers;
+  #headers: TableHeader[];
   /**
    * The rows of the table.
-   *
-   * @type {string[][]}
    */
-  #rows;
+  #rows: string[][];
 
   /**
    * Create a new table.
-   *
-   * @param {TableHeader[]} headers
-   * @param {string[][]} rows
    */
-  constructor(headers, rows) {
+  constructor(headers: TableHeader[], rows: string[][]) {
     super();
 
     this.#headers = headers;

@@ -1,23 +1,77 @@
 import { JSDOM } from 'jsdom';
 import { randomUUID } from 'node:crypto';
-import { Project } from 'ts-morph';
+import type { PreprocessorGroup } from 'svelte/compiler';
+import { Project, type SourceFile } from 'ts-morph';
 
-import * as Markdown from '../markdown/index.js';
+import * as Markdown from '$lib/markdown/index.js';
+
+import { resolveSvelte4Events } from './events.js';
+import { resolveSvelte4Props } from './props.js';
+import { resolveSvelte4Slots } from './slots.js';
+
+type Options = {
+  /**
+   * The identifiers of the meta tag that contains the component configuration.
+   */
+  identifiers?: {
+    /**
+     * The identifier of the meta tag that contains the description of the component.
+     *
+     * @default "data-description"
+     */
+    description?: string;
+    /**
+     * The identifier of the meta tag that contains the symbols of the component.
+     *
+     * @default "data-doc"
+     */
+    global?: string;
+    /**
+     * The identifier of the meta tag that contains the symbol of the events.
+     *
+     * @default "data-symbol-events"
+     */
+    events?: string;
+    /**
+     * The identifier of the meta tag that contains the symbol of the props.
+     *
+     * @default "data-symbol-props"
+     */
+    props?: string;
+    /**
+     * The identifier of the meta tag that contains the symbol of the slots.
+     *
+     * @default "data-symbol-slots"
+     */
+    slots?: string;
+  };
+  /**
+   * The symbols of the component that contains the events, props, and slots.
+   */
+  symbols?: {
+    /**
+     * The symbol of the component that contains the events.
+     *
+     * @default "$$Events"
+     */
+    events?: string;
+    /**
+     * The symbol of the component that contains the props.
+     *
+     * @default "$$Props"
+     */
+    props?: string;
+    /**
+     * The symbol of the component that contains the slots.
+     *
+     * @default "$$Slots"
+     */
+    slots?: string;
+  };
+};
 
 /**
  * A Svelte preprocessor that generates documentation for Svelte 4 components.
- *
- * @param {object} [options={}] The options of the preprocessor.
- * @param {object} [options.identifiers={}] The identifiers of the meta tag that contains the component configuration.
- * @param {string} [options.identifiers.description="data-description"] The identifier of the meta tag that contains the description of the component. Defaults to `data-description`.
- * @param {string} [options.identifiers.global="data-doc"] The identifier of the meta tag that contains the symbols of the component. Defaults to `data-doc`.
- * @param {string} [options.identifiers.events="data-symbol-events"] The identifier of the meta tag that contains the symbol of the events. Defaults to `data-symbol-events`.
- * @param {string} [options.identifiers.props="data-symbol-props"] The identifier of the meta tag that contains the symbol of the props. Defaults to `data-symbol-props`.
- * @param {string} [options.identifiers.slots="data-symbol-slots"] The identifier of the meta tag that contains the symbol of the slots. Defaults to `data-symbol-slots`.
- * @param {object} [options.symbols={}] The symbols of the component that contains the events, props, and slots.
- * @param {string} [options.symbols.events="$$Events"] The symbol of the component that contains the events. Defaults to `$$Events`.
- * @param {string} [options.symbols.props="$$Props"] The symbol of the component that contains the props. Defaults to `$$Props`.
- * @param {string} [options.symbols.slots="$$Slots"] The symbol of the component that contains the slots. Defaults to `$$Slots`.
  *
  * @example
  * `src/lib/components/button.svelte`:
@@ -97,18 +151,19 @@ import * as Markdown from '../markdown/index.js';
  * </button>
  * ```
  */
-export default function preprocessor(options = {}) {
+export default function preprocessor(options: Options = {}): PreprocessorGroup {
   const project = new Project();
 
-  return /** @type {import('svelte/compiler').PreprocessorGroup} */ ({
-    name: 'svelte-components-doc-generator-preprocessor',
+  return {
+    name: 'documentize-preprocessor',
 
     markup(context) {
       const { content, filename = '' } = context;
       const jsdom = new JSDOM(content);
       const globalIdentifier = options.identifiers?.global ?? 'data-doc';
-      /** @type {HTMLMetaElement | null} */
-      const meta = jsdom.window.document.querySelector(`meta[${globalIdentifier}]`);
+      const meta = jsdom.window.document.querySelector<HTMLMetaElement>(
+        `meta[${globalIdentifier}]`,
+      );
 
       if (!meta) {
         return;
@@ -152,95 +207,17 @@ export default function preprocessor(options = {}) {
         code: newCode,
       };
     },
-  });
-}
-
-/**
- * Resolve the Svelte 4 events of a component.
- *
- * @param {import('ts-morph').SourceFile} sourceFile
- * @param {string} symbolKey
- */
-function resolveSvelte4Events(sourceFile, symbolKey) {
-  const node = sourceFile.getTypeAlias(symbolKey) ?? sourceFile.getInterface(symbolKey);
-
-  if (!node) {
-    return [];
-  }
-
-  return node
-    .getType()
-    .getProperties()
-    .map((symbol) => ({
-      comment: symbol.compilerSymbol.getDocumentationComment(undefined),
-      name: symbol.getName(),
-    }));
-}
-
-/**
- * Resolve the Svelte 4 props of a component.
- *
- * @param {import('ts-morph').SourceFile} sourceFile
- * @param {string} symbolKey
- */
-function resolveSvelte4Props(sourceFile, symbolKey) {
-  const node = sourceFile.getTypeAlias(symbolKey) ?? sourceFile.getInterface(symbolKey);
-
-  if (!node) {
-    return [];
-  }
-
-  return node
-    .getType()
-    .getProperties()
-    .map((symbol) => ({
-      comment: symbol.compilerSymbol.getDocumentationComment(undefined),
-      name: symbol.getName(),
-    }));
-}
-
-/**
- * Resolve the Svelte 4 slots of a component.
- *
- * @param {import('ts-morph').SourceFile} sourceFile
- * @param {string} symbolKey
- */
-function resolveSvelte4Slots(sourceFile, symbolKey) {
-  const node = sourceFile.getTypeAlias(symbolKey) ?? sourceFile.getInterface(symbolKey);
-
-  if (!node) {
-    return [];
-  }
-
-  return node
-    .getType()
-    .getProperties()
-    .map((symbol) => ({
-      comment: symbol.compilerSymbol.getDocumentationComment(undefined),
-      name: symbol.getName(),
-      properties: symbol
-        .getValueDeclarationOrThrow()
-        .getType()
-        .getProperties()
-        .map((prop) => ({
-          name: prop.getName(),
-          comment: prop.compilerSymbol.getDocumentationComment(undefined),
-        })),
-    }));
+  };
 }
 
 /**
  * Build the documentation of a Svelte 4 component.
- *
- * @param {import('ts-morph').SourceFile} sourceFile The Typescript of the component extracted into a source file.
- * @param {string} description The description of the component.
- * @param {{
- *  events: string;
- *  props: string;
- *  slots: string;
- * }} symbols
  */
-function buildDoc(sourceFile, description, symbols) {
+function buildDoc(
+  sourceFile: SourceFile,
+  description: string,
+  symbols: NonNullable<Required<Options['symbols']>>,
+) {
   const svelte4Events = resolveSvelte4Events(sourceFile, symbols.events);
   const svelte4Props = resolveSvelte4Props(sourceFile, symbols.props);
   const svelte4Slots = resolveSvelte4Slots(sourceFile, symbols.slots);
@@ -311,7 +288,7 @@ function buildDoc(sourceFile, description, symbols) {
             text: 'Prop',
           },
         ],
-        svelte4Slots.reduce((acc, slot) => {
+        svelte4Slots.reduce<[slot: string, prop: string][]>((acc, slot) => {
           acc.push([`\`${slot.name}\``, '']);
 
           for (const property of slot.properties) {
@@ -319,7 +296,7 @@ function buildDoc(sourceFile, description, symbols) {
           }
 
           return acc;
-        }, /** @type {[slot: string, prop: string][]} */ ([])),
+        }, []),
       ),
     );
   } else {
