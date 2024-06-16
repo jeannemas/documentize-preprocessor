@@ -50,7 +50,7 @@ export default config;
 The preprocessor accepts the following configuration options:
 
 ```typescript
-type Options = {
+type Config = {
   /**
    * The data-attributes of the meta tag that contains the component configuration.
    */
@@ -86,6 +86,12 @@ type Options = {
      */
     slots?: DataAttribute;
   };
+  /**
+   * Whether to enable debug mode.
+   *
+   * Debug mode will log additional information to the console.
+   */
+  debug?: boolean;
   /**
    * The symbols of the component.
    */
