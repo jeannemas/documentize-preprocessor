@@ -1,5 +1,11 @@
 # @jeanne-mas/documentize-preprocessor
 
+## 0.0.5
+
+### Patch Changes
+
+- 23c0532: Bugfixes + improved documentation
+
 ## 0.0.4
 
 ### Patch Changes
