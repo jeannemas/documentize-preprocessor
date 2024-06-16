@@ -218,6 +218,7 @@ export default function preprocessor(config: Config = {}): PreprocessorGroup {
       );
       const sourceFileContent = `${scriptContextModule?.innerHTML ?? ''}\n${scriptNotContextModule?.innerHTML ?? ''}`;
       const sourceFile = project.createSourceFile(`${filename}.ts`, sourceFileContent);
+      const description = resolveDescription(meta.attributes, resolvedConfig);
       const svelte4Events = resolveSvelte4Events(
         filename,
         resolvedComponentConfig,
@@ -236,7 +237,23 @@ export default function preprocessor(config: Config = {}): PreprocessorGroup {
         resolvedConfig,
         sourceFile,
       );
-      const description = resolveDescription(meta.attributes, resolvedConfig);
+
+      if (resolvedConfig.debug) {
+        console.info('Resolved description', description);
+        console.info(
+          `Resolved Svelte 4 events from symbol '${resolvedComponentConfig.events}'`,
+          svelte4Events,
+        );
+        console.info(
+          `Resolved Svelte 4 props from symbol '${resolvedComponentConfig.props}'`,
+          svelte4Props,
+        );
+        console.info(
+          `Resolved Svelte 4 slots from symbol '${resolvedComponentConfig.slots}'`,
+          svelte4Slots,
+        );
+      }
+
       const doc = buildDoc(svelte4Events, svelte4Props, svelte4Slots, description);
       const regex = new RegExp(`<meta\\s+${resolvedConfig.dataAttributes.global}[^>]*>`, 'gm');
       const comment = `<!--\n${doc.trim()}\n-->`;
