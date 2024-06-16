@@ -9,60 +9,61 @@ import { resolveSvelte4Events } from './events.js';
 import { resolveSvelte4Props } from './props.js';
 import { resolveSvelte4Slots } from './slots.js';
 
+type DataAttribute = `data-${string}`;
 type Options = {
   /**
-   * The identifiers of the meta tag that contains the component configuration.
+   * The data-attributes of the meta tag that contains the component configuration.
    */
-  identifiers?: {
+  dataAttributes?: {
     /**
-     * The identifier of the meta tag that contains the description of the component.
+     * The data-attribute of the meta tag that contains the description of the component.
      *
      * @default "data-description"
      */
-    description?: string;
+    description?: DataAttribute;
     /**
-     * The identifier of the meta tag that contains the symbols of the component.
+     * The data-attribute of the meta tag used to identify the tag as the configuration for the preprocessor.
      *
      * @default "data-doc"
      */
-    global?: string;
+    global?: DataAttribute;
     /**
-     * The identifier of the meta tag that contains the symbol of the events.
+     * The data-attribute of the meta tag that contains the symbol of the events.
      *
      * @default "data-symbol-events"
      */
-    events?: string;
+    events?: DataAttribute;
     /**
-     * The identifier of the meta tag that contains the symbol of the props.
+     * The data-attribute of the meta tag that contains the symbol of the props.
      *
      * @default "data-symbol-props"
      */
-    props?: string;
+    props?: DataAttribute;
     /**
-     * The identifier of the meta tag that contains the symbol of the slots.
+     * The data-attribute of the meta tag that contains the symbol of the slots.
      *
      * @default "data-symbol-slots"
      */
-    slots?: string;
+    slots?: DataAttribute;
   };
   /**
-   * The symbols of the component that contains the events, props, and slots.
+   * The symbols of the component.
    */
   symbols?: {
     /**
-     * The symbol of the component that contains the events.
+     * The symbol to look for inside the component that contains the events.
      *
      * @default "$$Events"
      */
     events?: string;
     /**
-     * The symbol of the component that contains the props.
+     * The symbol to look for inside the component that contains the props.
      *
      * @default "$$Props"
      */
     props?: string;
     /**
-     * The symbol of the component that contains the slots.
+     * The symbol to look for inside the component that contains the slots.
      *
      * @default "$$Slots"
      */
@@ -152,6 +153,20 @@ type Options = {
  * ```
  */
 export default function preprocessor(options: Options = {}): PreprocessorGroup {
+  const {
+    dataAttributes: {
+      description: defaultDescriptionDataAttribute = 'data-description',
+      global: defaultGlobalDataAttribute = 'data-doc',
+      events: defaultEventsDataAttribute = 'data-symbol-events',
+      props: defaultPropsDataAttribute = 'data-symbol-props',
+      slots: defaultSlotsDataAttribute = 'data-symbol-slots',
+    } = {},
+    symbols: {
+      events: defaultEventsSymbol = '$$Events',
+      props: defaultPropsSymbol = '$$Props',
+      slots: defaultSlotsSymbol = '$$Slots',
+    } = {},
+  } = options;
   const project = new Project();
 
   return {
@@ -160,9 +175,8 @@ export default function preprocessor(options: Options = {}): PreprocessorGroup {
     markup(context) {
       const { content, filename = '' } = context;
       const jsdom = new JSDOM(content);
-      const globalIdentifier = options.identifiers?.global ?? 'data-doc';
       const meta = jsdom.window.document.querySelector<HTMLMetaElement>(
-        `meta[${globalIdentifier}]`,
+        `meta[${defaultGlobalDataAttribute}]`,
       );
 
       if (!meta) {
@@ -178,21 +192,20 @@ export default function preprocessor(options: Options = {}): PreprocessorGroup {
         `${scriptContextModule?.innerHTML ?? ''}\n${scriptNotContextModule?.innerHTML ?? ''}`,
       );
       const description =
-        meta.attributes.getNamedItem(options.identifiers?.description ?? 'data-description')
-          ?.textContent ?? '';
+        meta.attributes.getNamedItem(defaultDescriptionDataAttribute)?.textContent ?? '';
       const doc = buildDoc(sourceFile, description, {
         events:
-          meta.attributes.getNamedItem(options.identifiers?.events ?? 'data-symbol-events')
-            ?.textContent ?? '$$Events',
+          meta.attributes.getNamedItem(defaultEventsDataAttribute)?.textContent ??
+          defaultEventsSymbol,
         props:
-          meta.attributes.getNamedItem(options.identifiers?.props ?? 'data-symbol-props')
-            ?.textContent ?? '$$Props',
+          meta.attributes.getNamedItem(defaultPropsDataAttribute)?.textContent ??
+          defaultPropsSymbol,
         slots:
-          meta.attributes.getNamedItem(options.identifiers?.slots ?? 'data-symbol-slots')
-            ?.textContent ?? '$$Slots',
+          meta.attributes.getNamedItem(defaultSlotsDataAttribute)?.textContent ??
+          defaultSlotsSymbol,
       });
 
-      const regex = new RegExp(`<meta\\s+${globalIdentifier}[^>]*>`, 'gm');
+      const regex = new RegExp(`<meta\\s+${defaultGlobalDataAttribute}[^>]*>`, 'gm');
       const comment = `<!--\n@component\n${doc.trim()}\n-->`;
       const newCode = content.replace(regex, comment);
       const patchIsSuccessful = newCode.includes(comment);
