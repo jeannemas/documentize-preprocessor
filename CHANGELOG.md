@@ -1,5 +1,11 @@
 # @jeanne-mas/documentize-preprocessor
 
+## 0.0.6
+
+### Patch Changes
+
+- 4c166fd: Small rework + perfs improvements
+
 ## 0.0.5
 
 ### Patch Changes
