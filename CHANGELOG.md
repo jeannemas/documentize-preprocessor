@@ -1,5 +1,11 @@
 # @jeanne-mas/documentize-preprocessor
 
+## 0.0.7
+
+### Patch Changes
+
+- c14a364: Added improved debug logging
+
 ## 0.0.6
 
 ### Patch Changes
