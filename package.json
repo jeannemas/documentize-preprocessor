@@ -46,6 +46,7 @@
   ],
   "homepage": "https://github.com/jeannemas/documentize-preprocessor",
   "license": "MIT",
+  "main": "./dist/index.js",
   "name": "@jeanne-mas/documentize-preprocessor",
   "peerDependencies": {
     "svelte": "^4.0.0"
