@@ -1,5 +1,11 @@
 # @jeanne-mas/documentize-preprocessor
 
+## 0.0.4
+
+### Patch Changes
+
+- 09c4e01: Added default export
+
 ## 0.0.3
 
 ### Patch Changes
