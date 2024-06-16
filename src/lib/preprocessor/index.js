@@ -98,61 +98,61 @@ import * as Markdown from '../markdown/index.js';
  * ```
  */
 export default function preprocessor(options = {}) {
-	const project = new Project();
+  const project = new Project();
 
-	return /** @type {import('svelte/compiler').PreprocessorGroup} */ ({
-		name: 'svelte-components-doc-generator-preprocessor',
+  return /** @type {import('svelte/compiler').PreprocessorGroup} */ ({
+    name: 'svelte-components-doc-generator-preprocessor',
 
-		markup(context) {
-			const { content, filename = '' } = context;
-			const jsdom = new JSDOM(content);
-			const globalIdentifier = options.identifiers?.global ?? 'data-doc';
-			/** @type {HTMLMetaElement | null} */
-			const meta = jsdom.window.document.querySelector(`meta[${globalIdentifier}]`);
+    markup(context) {
+      const { content, filename = '' } = context;
+      const jsdom = new JSDOM(content);
+      const globalIdentifier = options.identifiers?.global ?? 'data-doc';
+      /** @type {HTMLMetaElement | null} */
+      const meta = jsdom.window.document.querySelector(`meta[${globalIdentifier}]`);
 
-			if (!meta) {
-				return;
-			}
+      if (!meta) {
+        return;
+      }
 
-			const scriptContextModule = jsdom.window.document.querySelector('script[context="module"]');
-			const scriptNotContextModule = jsdom.window.document.querySelector(
-				'script:not([context="module"])'
-			);
-			const sourceFile = project.createSourceFile(
-				`${filename}_${randomUUID()}.ts`,
-				`${scriptContextModule?.innerHTML ?? ''}\n${scriptNotContextModule?.innerHTML ?? ''}`
-			);
-			const description =
-				meta.attributes.getNamedItem(options.identifiers?.description ?? 'data-description')
-					?.textContent ?? '';
-			const doc = buildDoc(sourceFile, description, {
-				events:
-					meta.attributes.getNamedItem(options.identifiers?.events ?? 'data-symbol-events')
-						?.textContent ?? '$$Events',
-				props:
-					meta.attributes.getNamedItem(options.identifiers?.props ?? 'data-symbol-props')
-						?.textContent ?? '$$Props',
-				slots:
-					meta.attributes.getNamedItem(options.identifiers?.slots ?? 'data-symbol-slots')
-						?.textContent ?? '$$Slots'
-			});
+      const scriptContextModule = jsdom.window.document.querySelector('script[context="module"]');
+      const scriptNotContextModule = jsdom.window.document.querySelector(
+        'script:not([context="module"])',
+      );
+      const sourceFile = project.createSourceFile(
+        `${filename}_${randomUUID()}.ts`,
+        `${scriptContextModule?.innerHTML ?? ''}\n${scriptNotContextModule?.innerHTML ?? ''}`,
+      );
+      const description =
+        meta.attributes.getNamedItem(options.identifiers?.description ?? 'data-description')
+          ?.textContent ?? '';
+      const doc = buildDoc(sourceFile, description, {
+        events:
+          meta.attributes.getNamedItem(options.identifiers?.events ?? 'data-symbol-events')
+            ?.textContent ?? '$$Events',
+        props:
+          meta.attributes.getNamedItem(options.identifiers?.props ?? 'data-symbol-props')
+            ?.textContent ?? '$$Props',
+        slots:
+          meta.attributes.getNamedItem(options.identifiers?.slots ?? 'data-symbol-slots')
+            ?.textContent ?? '$$Slots',
+      });
 
-			const regex = new RegExp(`<meta\\s+${globalIdentifier}[^>]*>`, 'gm');
-			const comment = `<!--\n@component\n${doc.trim()}\n-->`;
-			const newCode = content.replace(regex, comment);
-			const patchIsSuccessful = newCode.includes(comment);
+      const regex = new RegExp(`<meta\\s+${globalIdentifier}[^>]*>`, 'gm');
+      const comment = `<!--\n@component\n${doc.trim()}\n-->`;
+      const newCode = content.replace(regex, comment);
+      const patchIsSuccessful = newCode.includes(comment);
 
-			if (!patchIsSuccessful) {
-				console.warn(`Failed to patch ${filename}`);
+      if (!patchIsSuccessful) {
+        console.warn(`Failed to patch ${filename}`);
 
-				return;
-			}
+        return;
+      }
 
-			return {
-				code: newCode
-			};
-		}
-	});
+      return {
+        code: newCode,
+      };
+    },
+  });
 }
 
 /**
@@ -162,19 +162,19 @@ export default function preprocessor(options = {}) {
  * @param {string} symbolKey
  */
 function resolveSvelte4Events(sourceFile, symbolKey) {
-	const node = sourceFile.getTypeAlias(symbolKey) ?? sourceFile.getInterface(symbolKey);
+  const node = sourceFile.getTypeAlias(symbolKey) ?? sourceFile.getInterface(symbolKey);
 
-	if (!node) {
-		return [];
-	}
+  if (!node) {
+    return [];
+  }
 
-	return node
-		.getType()
-		.getProperties()
-		.map((symbol) => ({
-			comment: symbol.compilerSymbol.getDocumentationComment(undefined),
-			name: symbol.getName()
-		}));
+  return node
+    .getType()
+    .getProperties()
+    .map((symbol) => ({
+      comment: symbol.compilerSymbol.getDocumentationComment(undefined),
+      name: symbol.getName(),
+    }));
 }
 
 /**
@@ -184,19 +184,19 @@ function resolveSvelte4Events(sourceFile, symbolKey) {
  * @param {string} symbolKey
  */
 function resolveSvelte4Props(sourceFile, symbolKey) {
-	const node = sourceFile.getTypeAlias(symbolKey) ?? sourceFile.getInterface(symbolKey);
+  const node = sourceFile.getTypeAlias(symbolKey) ?? sourceFile.getInterface(symbolKey);
 
-	if (!node) {
-		return [];
-	}
+  if (!node) {
+    return [];
+  }
 
-	return node
-		.getType()
-		.getProperties()
-		.map((symbol) => ({
-			comment: symbol.compilerSymbol.getDocumentationComment(undefined),
-			name: symbol.getName()
-		}));
+  return node
+    .getType()
+    .getProperties()
+    .map((symbol) => ({
+      comment: symbol.compilerSymbol.getDocumentationComment(undefined),
+      name: symbol.getName(),
+    }));
 }
 
 /**
@@ -206,27 +206,27 @@ function resolveSvelte4Props(sourceFile, symbolKey) {
  * @param {string} symbolKey
  */
 function resolveSvelte4Slots(sourceFile, symbolKey) {
-	const node = sourceFile.getTypeAlias(symbolKey) ?? sourceFile.getInterface(symbolKey);
+  const node = sourceFile.getTypeAlias(symbolKey) ?? sourceFile.getInterface(symbolKey);
 
-	if (!node) {
-		return [];
-	}
+  if (!node) {
+    return [];
+  }
 
-	return node
-		.getType()
-		.getProperties()
-		.map((symbol) => ({
-			comment: symbol.compilerSymbol.getDocumentationComment(undefined),
-			name: symbol.getName(),
-			properties: symbol
-				.getValueDeclarationOrThrow()
-				.getType()
-				.getProperties()
-				.map((prop) => ({
-					name: prop.getName(),
-					comment: prop.compilerSymbol.getDocumentationComment(undefined)
-				}))
-		}));
+  return node
+    .getType()
+    .getProperties()
+    .map((symbol) => ({
+      comment: symbol.compilerSymbol.getDocumentationComment(undefined),
+      name: symbol.getName(),
+      properties: symbol
+        .getValueDeclarationOrThrow()
+        .getType()
+        .getProperties()
+        .map((prop) => ({
+          name: prop.getName(),
+          comment: prop.compilerSymbol.getDocumentationComment(undefined),
+        })),
+    }));
 }
 
 /**
@@ -241,90 +241,90 @@ function resolveSvelte4Slots(sourceFile, symbolKey) {
  * }} symbols
  */
 function buildDoc(sourceFile, description, symbols) {
-	const svelte4Events = resolveSvelte4Events(sourceFile, symbols.events);
-	const svelte4Props = resolveSvelte4Props(sourceFile, symbols.props);
-	const svelte4Slots = resolveSvelte4Slots(sourceFile, symbols.slots);
-	const markdownBuilder = new Markdown.Builder();
+  const svelte4Events = resolveSvelte4Events(sourceFile, symbols.events);
+  const svelte4Props = resolveSvelte4Props(sourceFile, symbols.props);
+  const svelte4Slots = resolveSvelte4Slots(sourceFile, symbols.slots);
+  const markdownBuilder = new Markdown.Builder();
 
-	markdownBuilder.add(new Markdown.Paragraph(description), new Markdown.Heading(3, 'Events'));
+  markdownBuilder.add(new Markdown.Paragraph(description), new Markdown.Heading(3, 'Events'));
 
-	if (svelte4Events.length > 0) {
-		svelte4Events.sort((a, b) => a.name.localeCompare(b.name)); // Sort events by name alphabetically
+  if (svelte4Events.length > 0) {
+    svelte4Events.sort((a, b) => a.name.localeCompare(b.name)); // Sort events by name alphabetically
 
-		markdownBuilder.add(
-			new Markdown.Paragraph('The following events are dispatched by this component:'),
-			new Markdown.Table(
-				[
-					{
-						align: 'left',
-						text: 'Event'
-					}
-				],
-				svelte4Events.map((event) => [`\`${event.name}\``])
-			)
-		);
-	} else {
-		markdownBuilder.add(new Markdown.Paragraph('This component does not dispatch any events.'));
-	}
+    markdownBuilder.add(
+      new Markdown.Paragraph('The following events are dispatched by this component:'),
+      new Markdown.Table(
+        [
+          {
+            align: 'left',
+            text: 'Event',
+          },
+        ],
+        svelte4Events.map((event) => [`\`${event.name}\``]),
+      ),
+    );
+  } else {
+    markdownBuilder.add(new Markdown.Paragraph('This component does not dispatch any events.'));
+  }
 
-	markdownBuilder.add(new Markdown.Heading(3, 'Props'));
+  markdownBuilder.add(new Markdown.Heading(3, 'Props'));
 
-	if (svelte4Props.length > 0) {
-		svelte4Props.sort((a, b) => a.name.localeCompare(b.name)); // Sort props by name alphabetically
+  if (svelte4Props.length > 0) {
+    svelte4Props.sort((a, b) => a.name.localeCompare(b.name)); // Sort props by name alphabetically
 
-		markdownBuilder.add(
-			new Markdown.Paragraph('The following props are available for this component:'),
-			new Markdown.Table(
-				[
-					{
-						align: 'left',
-						text: 'Prop'
-					},
-					{
-						align: 'left',
-						text: 'Description'
-					}
-				],
+    markdownBuilder.add(
+      new Markdown.Paragraph('The following props are available for this component:'),
+      new Markdown.Table(
+        [
+          {
+            align: 'left',
+            text: 'Prop',
+          },
+          {
+            align: 'left',
+            text: 'Description',
+          },
+        ],
 
-				svelte4Props.map((prop) => [`\`${prop.name}\``, ''])
-			)
-		);
-	} else {
-		markdownBuilder.add(new Markdown.Paragraph('This component does not have any props.'));
-	}
+        svelte4Props.map((prop) => [`\`${prop.name}\``, '']),
+      ),
+    );
+  } else {
+    markdownBuilder.add(new Markdown.Paragraph('This component does not have any props.'));
+  }
 
-	markdownBuilder.add(new Markdown.Heading(3, 'Slots'));
+  markdownBuilder.add(new Markdown.Heading(3, 'Slots'));
 
-	if (svelte4Slots.length > 0) {
-		svelte4Slots.sort((a, b) => a.name.localeCompare(b.name)); // Sort slots by name alphabetically
+  if (svelte4Slots.length > 0) {
+    svelte4Slots.sort((a, b) => a.name.localeCompare(b.name)); // Sort slots by name alphabetically
 
-		markdownBuilder.add(
-			new Markdown.Paragraph('The following slots are available for this component:'),
-			new Markdown.Table(
-				[
-					{
-						align: 'left',
-						text: 'Slot'
-					},
-					{
-						align: 'left',
-						text: 'Prop'
-					}
-				],
-				svelte4Slots.reduce((acc, slot) => {
-					acc.push([`\`${slot.name}\``, '']);
+    markdownBuilder.add(
+      new Markdown.Paragraph('The following slots are available for this component:'),
+      new Markdown.Table(
+        [
+          {
+            align: 'left',
+            text: 'Slot',
+          },
+          {
+            align: 'left',
+            text: 'Prop',
+          },
+        ],
+        svelte4Slots.reduce((acc, slot) => {
+          acc.push([`\`${slot.name}\``, '']);
 
-					for (const property of slot.properties) {
-						acc.push(['', `\`${property.name}\``]);
-					}
+          for (const property of slot.properties) {
+            acc.push(['', `\`${property.name}\``]);
+          }
 
-					return acc;
-				}, /** @type {[slot: string, prop: string][]} */ ([]))
-			)
-		);
-	} else {
-		markdownBuilder.add(new Markdown.Paragraph('This component does not have any slots.'));
-	}
+          return acc;
+        }, /** @type {[slot: string, prop: string][]} */ ([])),
+      ),
+    );
+  } else {
+    markdownBuilder.add(new Markdown.Paragraph('This component does not have any slots.'));
+  }
 
-	return markdownBuilder.toString();
+  return markdownBuilder.toString();
 }

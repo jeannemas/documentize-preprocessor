@@ -1,25 +1,25 @@
 import { Node } from './internal.js';
 
 export class Paragraph extends Node {
-	/**
-	 * The text of the heading.
-	 *
-	 * @type {string}
-	 */
-	#text;
+  /**
+   * The text of the heading.
+   *
+   * @type {string}
+   */
+  #text;
 
-	/**
-	 * Create a new heading.
-	 *
-	 * @param {string} text
-	 */
-	constructor(text) {
-		super();
+  /**
+   * Create a new heading.
+   *
+   * @param {string} text
+   */
+  constructor(text) {
+    super();
 
-		this.#text = text;
-	}
+    this.#text = text;
+  }
 
-	toString() {
-		return `\n${this.#text.trim()}\n\n`;
-	}
+  toString() {
+    return `\n${this.#text.trim()}\n\n`;
+  }
 }

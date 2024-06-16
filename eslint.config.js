@@ -6,39 +6,39 @@ import ts from 'typescript-eslint';
 
 /** @type {import('eslint').Linter.FlatConfig[]} */
 export default [
-	js.configs.recommended,
-	...ts.configs.recommended,
-	...svelte.configs['flat/recommended'],
-	prettier,
-	...svelte.configs['flat/prettier'],
-	{
-		languageOptions: {
-			globals: {
-				...globals.browser,
-				...globals.node
-			}
-		}
-	},
-	{
-		files: ['**/*.svelte'],
-		languageOptions: {
-			parserOptions: {
-				parser: ts.parser
-			}
-		},
-		rules: {
-			'@typescript-eslint/no-unused-vars': [
-				'warn',
-				{
-					argsIgnorePattern: '^_',
-					// To prevent false positives with Svelte Events&Props&Slots
-					varsIgnorePattern: '^\\$\\$(Events|Props|Slots)$'
-				}
-			],
-			'no-undef': 'off'
-		}
-	},
-	{
-		ignores: ['build/', '.svelte-kit/', 'dist/']
-	}
+  js.configs.recommended,
+  ...ts.configs.recommended,
+  ...svelte.configs['flat/recommended'],
+  prettier,
+  ...svelte.configs['flat/prettier'],
+  {
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+      },
+    },
+  },
+  {
+    files: ['**/*.svelte'],
+    languageOptions: {
+      parserOptions: {
+        parser: ts.parser,
+      },
+    },
+    rules: {
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        {
+          argsIgnorePattern: '^_',
+          // To prevent false positives with Svelte Events&Props&Slots
+          varsIgnorePattern: '^\\$\\$(Events|Props|Slots)$',
+        },
+      ],
+      'no-undef': 'off',
+    },
+  },
+  {
+    ignores: ['build/', '.svelte-kit/', 'dist/'],
+  },
 ];

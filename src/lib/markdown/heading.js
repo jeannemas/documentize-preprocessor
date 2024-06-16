@@ -5,34 +5,34 @@ import { Node } from './internal.js';
  */
 
 export class Heading extends Node {
-	/**
-	 * The level of the heading.
-	 * For example, `1` for an `<h1>`, `2` for an `<h2>`, etc.
-	 *
-	 * @type {HeadingLevel}
-	 */
-	#level;
-	/**
-	 * The text of the heading.
-	 *
-	 * @type {string}
-	 */
-	#text;
+  /**
+   * The level of the heading.
+   * For example, `1` for an `<h1>`, `2` for an `<h2>`, etc.
+   *
+   * @type {HeadingLevel}
+   */
+  #level;
+  /**
+   * The text of the heading.
+   *
+   * @type {string}
+   */
+  #text;
 
-	/**
-	 * Create a new heading.
-	 *
-	 * @param {HeadingLevel} level
-	 * @param {string} text
-	 */
-	constructor(level, text) {
-		super();
+  /**
+   * Create a new heading.
+   *
+   * @param {HeadingLevel} level
+   * @param {string} text
+   */
+  constructor(level, text) {
+    super();
 
-		this.#level = level;
-		this.#text = text;
-	}
+    this.#level = level;
+    this.#text = text;
+  }
 
-	toString() {
-		return `${'#'.repeat(this.#level)} ${this.#text}\n`;
-	}
+  toString() {
+    return `${'#'.repeat(this.#level)} ${this.#text}\n`;
+  }
 }
