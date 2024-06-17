@@ -1,1 +1,3 @@
-pnpm format && pnpm package && pnpm check
+#!/bin/bash
+
+pnpm test:unit --run && pnpm lint && pnpm package && pnpm check

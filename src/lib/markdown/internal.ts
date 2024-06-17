@@ -1,4 +1,4 @@
-export class Node {
+export class MarkdownNode {
   /**
    * Convert the node to a string.
    */
@@ -6,17 +6,17 @@ export class Node {
     throw new Error('Not implemented');
   }
 }
-export class Container extends Node {
+export class Container extends MarkdownNode {
   /**
    * The nodes in the container.
    */
-  protected _nodes: Node[] = [];
+  protected _nodes: MarkdownNode[] = [];
 
   /**
    * Add nodes to the container.
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  add(...nodes: Node[]): this {
+  add(...nodes: MarkdownNode[]): this {
     throw new Error('Not implemented');
   }
 }

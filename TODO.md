@@ -1,0 +1,1 @@
+- Consider removing JSDOM since it has such a performance impact

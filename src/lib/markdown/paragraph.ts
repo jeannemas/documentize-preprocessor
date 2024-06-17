@@ -1,21 +1,31 @@
-import { Node } from './internal.js';
+import { MarkdownNode } from './internal.js';
 
-export class Paragraph extends Node {
+/**
+ * A paragraph in a markdown document.
+ */
+export class Paragraph extends MarkdownNode {
   /**
-   * The text of the heading.
+   * The text of the paragraph.
    */
   #text: string;
 
   /**
-   * Create a new heading.
+   * Create a new paragraph.
    */
   constructor(text: string) {
     super();
 
+    if (typeof text !== 'string') {
+      throw new TypeError(`Invalid paragraph text: "${text}". Expected a string.`);
+    }
+
     this.#text = text;
   }
 
+  /**
+   * Convert the paragraph to a string.
+   */
   toString() {
-    return `\n${this.#text.trim()}\n\n`;
+    return `\n${this.#text}\n\n`;
   }
 }

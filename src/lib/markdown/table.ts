@@ -1,11 +1,23 @@
-import { Node } from './internal.js';
+import { MarkdownNode } from './internal.js';
 
-type TableHeader = {
+/**
+ * A table header.
+ */
+export type TableHeader = {
+  /**
+   * The alignment of the header.
+   */
   align: 'left' | 'right';
+  /**
+   * The text of the header.
+   */
   text: string;
 };
 
-export class Table extends Node {
+/**
+ * A table in a markdown document.
+ */
+export class Table extends MarkdownNode {
   /**
    * The headers of the table.
    */
@@ -25,20 +37,23 @@ export class Table extends Node {
     this.#rows = rows;
   }
 
+  /**
+   * Convert the table to a string.
+   */
   toString() {
-    const colsLength = this.#headers.map((header) => header.text.length);
+    const columnsLength = this.#headers.map((header) => header.text.length);
 
     for (const row of this.#rows) {
       for (let columnIndex = 0; columnIndex < row.length; columnIndex++) {
-        colsLength[columnIndex] = Math.max(colsLength[columnIndex], row[columnIndex].length);
+        columnsLength[columnIndex] = Math.max(columnsLength[columnIndex], row[columnIndex].length);
       }
     }
 
-    const headers = `| ${this.#headers.map((header, columnIndex) => header.text.padEnd(colsLength[columnIndex], ' ')).join(' | ')} |`;
+    const headers = `| ${this.#headers.map((header, columnIndex) => header.text.padEnd(columnsLength[columnIndex], ' ')).join(' | ')} |`;
     const separator = `| ${this.#headers
       .map(
         (header, columnIndex) =>
-          `${header.align === 'left' ? ':' : ''}${'-'.repeat(colsLength[columnIndex] - 1)}${header.align === 'right' ? ':' : ''}`,
+          `${header.align === 'left' ? ':' : ''}${'-'.repeat(columnsLength[columnIndex] - 1)}${header.align === 'right' ? ':' : ''}`,
       )
       .join(' | ')} |`;
     const rows = this.#rows
@@ -47,8 +62,8 @@ export class Table extends Node {
           `| ${row
             .map((cell, columnIndex) =>
               this.#headers[columnIndex].align === 'left'
-                ? cell.padEnd(colsLength[columnIndex], ' ')
-                : cell.padStart(colsLength[columnIndex], ' '),
+                ? cell.padEnd(columnsLength[columnIndex], ' ')
+                : cell.padStart(columnsLength[columnIndex], ' '),
             )
             .join(' | ')} |`,
       )

@@ -1,10 +1,10 @@
-import { Container, type Node } from './internal.js';
+import { Container, type MarkdownNode } from './internal.js';
 
 export class Builder extends Container {
   /**
    * Add nodes to the builder.
    */
-  add(...nodes: Node[]) {
+  add(...nodes: MarkdownNode[]) {
     this._nodes.push(...nodes);
 
     return this;
