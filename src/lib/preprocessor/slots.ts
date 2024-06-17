@@ -1,46 +1,37 @@
-import type { SourceFile } from 'ts-morph';
+import type { Node } from 'ts-morph';
 
-import type { ResolvedComponentConfig, ResolvedConfig } from './config.js';
+/**
+ * A Svelte 4 slot property.
+ */
+type Svelte4SlotProperty = {
+  /**
+   * The name of the property.
+   */
+  name: string;
+};
 
+/**
+ * A Svelte 4 slot.
+ */
 export type Svelte4Slot = {
   /**
    * The name of the slot.
    */
   name: string;
-  properties: {
-    /**
-     * The name of the property.
-     */
-    name: string;
-  }[];
+  /**
+   * The properties of the slot.
+   */
+  properties: Svelte4SlotProperty[];
 };
 
 /**
  * Resolve the Svelte 4 slots of a component.
  */
-export function resolveSvelte4Slots(
-  filename: string,
-  resolvedComponentConfig: ResolvedComponentConfig,
-  resolvedConfig: ResolvedConfig,
-  sourceFile: SourceFile,
-): Svelte4Slot[] {
+export function resolveSvelte4Slots(node: Node): Svelte4Slot[] {
   const slots: Svelte4Slot[] = [];
-  const node =
-    sourceFile.getTypeAlias(resolvedComponentConfig.slots) ??
-    sourceFile.getInterface(resolvedComponentConfig.slots);
-
-  if (!node) {
-    if (resolvedConfig.debug) {
-      console.warn(
-        `Failed to resolve slots for symbol '${resolvedComponentConfig.slots}' inside '${filename}'`,
-      );
-    }
-
-    return slots;
-  }
 
   for (const symbol of node.getType().getProperties()) {
-    const properties: Svelte4Slot['properties'] = [];
+    const properties: Svelte4SlotProperty[] = [];
 
     for (const prop of symbol.getValueDeclarationOrThrow().getType().getProperties()) {
       properties.push({

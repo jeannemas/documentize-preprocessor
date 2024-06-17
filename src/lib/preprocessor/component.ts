@@ -2,10 +2,6 @@ import { JSDOM } from 'jsdom';
 
 type ScriptInfo = {
   /**
-   * The attributes of the script tag.
-   */
-  attributes: Record<string, string>;
-  /**
    * The content of the script tag.
    */
   content: string;
@@ -37,33 +33,13 @@ export function extractSvelte4ComponentParts(content: string): Svelte4Component 
   const scriptNotContextModule = jsdom.window.document.querySelector<HTMLScriptElement>(
     'script:not([context="module"])',
   );
-  const scriptContextModuleAttributes = [...(scriptContextModule?.attributes ?? [])].reduce<
-    Record<string, string>
-  >(
-    (acc, { name, value }) => ({
-      ...acc,
-      [name]: value,
-    }),
-    {},
-  );
-  const scriptNotContextModuleAttributes = [...(scriptNotContextModule?.attributes ?? [])].reduce<
-    Record<string, string>
-  >(
-    (acc, { name, value }) => ({
-      ...acc,
-      [name]: value,
-    }),
-    {},
-  );
 
   return {
     scripts: {
       contextModule: {
-        attributes: scriptContextModuleAttributes,
         content: scriptContextModule?.innerHTML ?? '',
       },
       notContextModule: {
-        attributes: scriptNotContextModuleAttributes,
         content: scriptNotContextModule?.innerHTML ?? '',
       },
     },

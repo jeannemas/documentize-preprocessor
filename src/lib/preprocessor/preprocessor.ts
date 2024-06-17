@@ -118,35 +118,44 @@ export default function documentizePreprocessor(config: Config = {}): Preprocess
       }
 
       const resolvedComponentConfig = resolveComponentConfig(resolvedConfig, meta.attributes);
-
-      if (resolvedConfig.debug) {
-        console.info(`Patching '${filename}' based on provided config`, resolvedComponentConfig);
-      }
-
       const { contextModule, notContextModule } = extractSvelte4ComponentParts(content).scripts;
       const sourceFileContent = `${contextModule.content}\n${notContextModule.content}`;
       const sourceFile = project.createSourceFile(`${filename}.ts`, sourceFileContent);
       const description = resolveDescription(meta.attributes, resolvedConfig);
-      const svelte4Events = resolveSvelte4Events(
-        filename,
-        resolvedComponentConfig,
-        resolvedConfig,
-        sourceFile,
-      );
-      const svelte4Props = resolveSvelte4Props(
-        filename,
-        resolvedComponentConfig,
-        resolvedConfig,
-        sourceFile,
-      );
-      const svelte4Slots = resolveSvelte4Slots(
-        filename,
-        resolvedComponentConfig,
-        resolvedConfig,
-        sourceFile,
-      );
+      const eventsNode =
+        sourceFile.getTypeAlias(resolvedComponentConfig.events) ??
+        sourceFile.getInterface(resolvedComponentConfig.events);
+      const propsNode =
+        sourceFile.getTypeAlias(resolvedComponentConfig.props) ??
+        sourceFile.getInterface(resolvedComponentConfig.props);
+      const slotsNode =
+        sourceFile.getTypeAlias(resolvedComponentConfig.slots) ??
+        sourceFile.getInterface(resolvedComponentConfig.slots);
+      const svelte4Events = eventsNode ? resolveSvelte4Events(eventsNode) : [];
+      const svelte4Props = propsNode ? resolveSvelte4Props(propsNode) : [];
+      const svelte4Slots = slotsNode ? resolveSvelte4Slots(slotsNode) : [];
 
       if (resolvedConfig.debug) {
+        console.info(`Patching '${filename}' based on provided config`, resolvedComponentConfig);
+
+        if (!eventsNode) {
+          console.warn(
+            `Failed to resolve events for symbol '${resolvedComponentConfig.events}' inside '${filename}'`,
+          );
+        }
+
+        if (!propsNode) {
+          console.warn(
+            `Failed to resolve props for symbol '${resolvedComponentConfig.props}' inside '${filename}'`,
+          );
+        }
+
+        if (!slotsNode) {
+          console.warn(
+            `Failed to resolve slots for symbol '${resolvedComponentConfig.slots}' inside '${filename}'`,
+          );
+        }
+
         console.info('Resolved description', description);
         console.info(
           `Resolved Svelte 4 events from symbol '${resolvedComponentConfig.events}'`,

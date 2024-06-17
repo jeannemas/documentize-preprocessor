@@ -5,7 +5,7 @@ import type { Svelte4Prop } from './props.js';
 import type { Svelte4Slot } from './slots.js';
 
 /**
- * Build the documentation of a Svelte 4 component.
+ * Build the documentation as Markdown of a Svelte 4 component.
  */
 export function buildDoc(
   events: Svelte4Event[],

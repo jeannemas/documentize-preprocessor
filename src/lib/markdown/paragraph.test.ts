@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { Paragraph } from './paragraph.js';
 
 describe(Paragraph.name, () => {
-  it('Specifying a text should the paragraph', () => {
+  it('Specifying a text should create the paragraph', () => {
     // Arrange
     const text = 'Lorem ipsum dolor sit amet';
 
