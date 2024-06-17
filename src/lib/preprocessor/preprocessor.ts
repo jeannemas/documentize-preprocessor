@@ -8,7 +8,7 @@ import { resolveDescription } from './description.js';
 import { buildDoc } from './doc.js';
 import { resolveSvelte4Events } from './events.js';
 import { Logger } from './logger.js';
-import { extractMeta, replaceMeta } from './meta.js';
+import { extractMeta } from './meta.js';
 import { resolveSvelte4Props } from './props.js';
 import { extractScriptContextModule, extractScriptNotContextModule } from './scripts.js';
 import { resolveSvelte4Slots } from './slots.js';
@@ -172,7 +172,7 @@ export default function documentizePreprocessor(config: Config = {}): Preprocess
 
       const doc = buildDoc(svelte4Events, svelte4Props, svelte4Slots, description);
       const comment = `<!--\n${doc.trim()}\n-->`;
-      const newCode = replaceMeta(content, meta, comment);
+      const newCode = content.replace(meta.regex, comment);
       const patchIsSuccessful = newCode.includes(comment);
 
       if (!patchIsSuccessful) {

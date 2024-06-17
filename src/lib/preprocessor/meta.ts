@@ -40,12 +40,3 @@ export function extractMeta(content: string, globalDataAttribute: DataAttribute)
 
   return metas.at(0) ?? null;
 }
-
-/**
- * Replace the meta tag with the new content.
- */
-export function replaceMeta(content: string, meta: Meta, replaceWith: string) {
-  const newCode = content.replace(meta.regex, replaceWith);
-
-  return newCode;
-}
