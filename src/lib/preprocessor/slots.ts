@@ -3,7 +3,7 @@ import type { Node } from 'ts-morph';
 /**
  * A Svelte 4 slot property.
  */
-type Svelte4SlotProperty = {
+export type Svelte4SlotProperty = {
   /**
    * The name of the property.
    */

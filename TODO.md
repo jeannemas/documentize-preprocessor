@@ -1,2 +1,3 @@
 - Consider removing JSDOM since it has such a performance impact
 - Extract Markdown builder into its own module
+- Add check for Svelte 4 as peer dependency

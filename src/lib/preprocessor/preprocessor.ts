@@ -2,12 +2,13 @@ import { JSDOM } from 'jsdom';
 import type { PreprocessorGroup } from 'svelte/compiler';
 import { Project } from 'ts-morph';
 
-import { extractSvelte4ComponentParts } from './component.js';
 import { resolveComponentConfig, resolveConfig, type Config } from './config.js';
+import { PREPROCESSOR_NAME } from './constants.js';
 import { resolveDescription } from './description.js';
 import { buildDoc } from './doc.js';
 import { resolveSvelte4Events } from './events.js';
 import { resolveSvelte4Props } from './props.js';
+import { extractScriptContextModule, extractScriptNotContextModule } from './scripts.js';
 import { resolveSvelte4Slots } from './slots.js';
 
 /**
@@ -101,7 +102,7 @@ export default function documentizePreprocessor(config: Config = {}): Preprocess
   }
 
   return {
-    name: 'documentize-preprocessor',
+    name: PREPROCESSOR_NAME,
 
     markup({ content, filename = '' }) {
       const jsdom = new JSDOM(content);
@@ -118,8 +119,9 @@ export default function documentizePreprocessor(config: Config = {}): Preprocess
       }
 
       const resolvedComponentConfig = resolveComponentConfig(resolvedConfig, meta.attributes);
-      const { contextModule, notContextModule } = extractSvelte4ComponentParts(content).scripts;
-      const sourceFileContent = `${contextModule.content}\n${notContextModule.content}`;
+      const contextModule = extractScriptContextModule(content);
+      const notContextModule = extractScriptNotContextModule(content);
+      const sourceFileContent = `${contextModule?.content ?? ''}\n${notContextModule?.content ?? ''}`;
       const sourceFile = project.createSourceFile(`${filename}.ts`, sourceFileContent);
       const description = resolveDescription(meta.attributes, resolvedConfig);
       const eventsNode =
