@@ -1,4 +1,4 @@
-import { JSDOM } from 'jsdom';
+import { join } from 'node:path';
 import type { PreprocessorGroup } from 'svelte/compiler';
 import { Project } from 'ts-morph';
 
@@ -7,6 +7,8 @@ import { PREPROCESSOR_NAME } from './constants.js';
 import { resolveDescription } from './description.js';
 import { buildDoc } from './doc.js';
 import { resolveSvelte4Events } from './events.js';
+import { Logger } from './logger.js';
+import { extractMeta, replaceMeta } from './meta.js';
 import { resolveSvelte4Props } from './props.js';
 import { extractScriptContextModule, extractScriptNotContextModule } from './scripts.js';
 import { resolveSvelte4Slots } from './slots.js';
@@ -32,7 +34,7 @@ import { resolveSvelte4Slots } from './slots.js';
  * </script>
  *
  * <meta
- *  data-doc
+ *  data-documentize
  *  data-symbol-events="$$Events"
  *  data-symbol-props="$$Props"
  *  data-symbol-slots="$$Slots"
@@ -95,34 +97,33 @@ import { resolveSvelte4Slots } from './slots.js';
  */
 export default function documentizePreprocessor(config: Config = {}): PreprocessorGroup {
   const resolvedConfig = resolveConfig(config);
+  const logger = new Logger(resolvedConfig.debug);
   const project = new Project();
 
-  if (resolvedConfig.debug) {
-    console.info('Global config', resolvedConfig);
-  }
+  logger.info('Global config', resolvedConfig);
 
   return {
     name: PREPROCESSOR_NAME,
 
     markup({ content, filename = '' }) {
-      const jsdom = new JSDOM(content);
-      const meta = jsdom.window.document.querySelector<HTMLMetaElement>(
-        `meta[${resolvedConfig.dataAttributes.global}]`,
-      );
+      const meta = extractMeta(content, resolvedConfig.dataAttributes.global);
 
       if (!meta) {
-        if (resolvedConfig.debug) {
-          console.warn(`Failed to find meta tag inside '${filename}'`);
-        }
-
+        // The component does not have any metadata, so we can't generate any documentation.
         return;
       }
 
-      const resolvedComponentConfig = resolveComponentConfig(resolvedConfig, meta.attributes);
-      const contextModule = extractScriptContextModule(content);
-      const notContextModule = extractScriptNotContextModule(content);
-      const sourceFileContent = `${contextModule?.content ?? ''}\n${notContextModule?.content ?? ''}`;
-      const sourceFile = project.createSourceFile(`${filename}.ts`, sourceFileContent);
+      const resolvedComponentConfig = resolveComponentConfig(meta.attributes, resolvedConfig);
+
+      logger.info(`Patching '${filename}' based on provided config`, resolvedComponentConfig);
+
+      const scriptContextModule = extractScriptContextModule(content);
+      const scriptNotContextModule = extractScriptNotContextModule(content);
+      const sourceFileContent = `${scriptContextModule?.content ?? ''}\n${scriptNotContextModule?.content ?? ''}`;
+      const sourceFile = project.createSourceFile(
+        join(filename, `${Date.now()}.ts`),
+        sourceFileContent,
+      );
       const description = resolveDescription(meta.attributes, resolvedConfig);
       const eventsNode =
         sourceFile.getTypeAlias(resolvedComponentConfig.events) ??
@@ -137,50 +138,45 @@ export default function documentizePreprocessor(config: Config = {}): Preprocess
       const svelte4Props = propsNode ? resolveSvelte4Props(propsNode) : [];
       const svelte4Slots = slotsNode ? resolveSvelte4Slots(slotsNode) : [];
 
-      if (resolvedConfig.debug) {
-        console.info(`Patching '${filename}' based on provided config`, resolvedComponentConfig);
-
-        if (!eventsNode) {
-          console.warn(
-            `Failed to resolve events for symbol '${resolvedComponentConfig.events}' inside '${filename}'`,
-          );
-        }
-
-        if (!propsNode) {
-          console.warn(
-            `Failed to resolve props for symbol '${resolvedComponentConfig.props}' inside '${filename}'`,
-          );
-        }
-
-        if (!slotsNode) {
-          console.warn(
-            `Failed to resolve slots for symbol '${resolvedComponentConfig.slots}' inside '${filename}'`,
-          );
-        }
-
-        console.info('Resolved description', description);
-        console.info(
-          `Resolved Svelte 4 events from symbol '${resolvedComponentConfig.events}'`,
-          svelte4Events,
-        );
-        console.info(
-          `Resolved Svelte 4 props from symbol '${resolvedComponentConfig.props}'`,
-          svelte4Props,
-        );
-        console.info(
-          `Resolved Svelte 4 slots from symbol '${resolvedComponentConfig.slots}'`,
-          svelte4Slots,
+      if (!eventsNode) {
+        logger.warn(
+          `Failed to resolve events for symbol '${resolvedComponentConfig.events}' inside '${filename}'`,
         );
       }
 
+      if (!propsNode) {
+        logger.warn(
+          `Failed to resolve props for symbol '${resolvedComponentConfig.props}' inside '${filename}'`,
+        );
+      }
+
+      if (!slotsNode) {
+        logger.warn(
+          `Failed to resolve slots for symbol '${resolvedComponentConfig.slots}' inside '${filename}'`,
+        );
+      }
+
+      logger.info('Resolved description', description);
+      logger.info(
+        `Resolved Svelte 4 events from symbol '${resolvedComponentConfig.events}'`,
+        svelte4Events,
+      );
+      logger.info(
+        `Resolved Svelte 4 props from symbol '${resolvedComponentConfig.props}'`,
+        svelte4Props,
+      );
+      logger.info(
+        `Resolved Svelte 4 slots from symbol '${resolvedComponentConfig.slots}'`,
+        svelte4Slots,
+      );
+
       const doc = buildDoc(svelte4Events, svelte4Props, svelte4Slots, description);
-      const regex = new RegExp(`<meta\\s+${resolvedConfig.dataAttributes.global}[^>]*>`, 'gm');
       const comment = `<!--\n${doc.trim()}\n-->`;
-      const newCode = content.replace(regex, comment);
+      const newCode = replaceMeta(content, meta, comment);
       const patchIsSuccessful = newCode.includes(comment);
 
       if (!patchIsSuccessful) {
-        console.warn(`Failed to patch ${filename}`);
+        logger.warn(`Failed to patch ${filename}`);
 
         return;
       }

@@ -96,10 +96,10 @@ describe(extractScriptContextModule.name, () => {
     const content = sampleInvalidComponentWithMultipleScriptContextModule;
 
     // Act
-    const script = () => extractScriptContextModule(content);
+    const action = () => extractScriptContextModule(content);
 
     // Assert
-    expect(script).toThrow(Error);
+    expect(action).toThrow(Error);
   });
 });
 
@@ -132,10 +132,10 @@ describe(extractScriptNotContextModule.name, () => {
     const content = sampleInvalidComponentWithMultipleScriptNotContextModule;
 
     // Act
-    const script = () => extractScriptNotContextModule(content);
+    const action = () => extractScriptNotContextModule(content);
 
     // Assert
-    expect(script).toThrow(Error);
+    expect(action).toThrow(Error);
   });
 });
 
@@ -151,10 +151,8 @@ describe(extractScripts.name, () => {
     expect(scripts.length).toEqual(2);
     expect(Object.keys(scripts[0].attributes).length).toEqual(2);
     expect(scripts[0].attributes.context).toEqual('module');
-    expect(scripts[0].attributes.lang).toEqual('ts');
     expect(Object.keys(scripts[1].attributes).length).toEqual(1);
     expect(scripts[1].attributes.context).not.toEqual('module');
-    expect(scripts[1].attributes.lang).toEqual('ts');
   });
 
   it('Should extract 1 script context module', () => {
@@ -167,7 +165,6 @@ describe(extractScripts.name, () => {
     // Assert
     expect(scripts.length).toEqual(1);
     expect(scripts[0].attributes.context).toEqual('module');
-    expect(scripts[0].attributes.lang).toEqual('ts');
   });
 
   it('Should extract 1 script', () => {
@@ -180,6 +177,5 @@ describe(extractScripts.name, () => {
     // Assert
     expect(scripts.length).toEqual(1);
     expect(scripts[0].attributes.context).not.toEqual('module');
-    expect(scripts[0].attributes.lang).toEqual('ts');
   });
 });

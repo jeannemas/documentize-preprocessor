@@ -1,7 +1,14 @@
 import type { RecursiveRequired } from '@sveltejs/kit';
 
-type DataAttribute = `data-${string}`;
+import type { Attributes } from './attributes.js';
 
+/**
+ * A data-attribute.
+ */
+export type DataAttribute = `data-${string}`;
+/**
+ * The configuration of the preprocessor.
+ */
 export type Config = {
   /**
    * The data-attributes of the meta tag that contains the component configuration.
@@ -16,7 +23,7 @@ export type Config = {
     /**
      * The data-attribute of the meta tag used to identify the tag as the configuration for the preprocessor.
      *
-     * @default "data-doc"
+     * @default "data-documentize"
      */
     global?: DataAttribute;
     /**
@@ -68,7 +75,13 @@ export type Config = {
     slots?: string;
   };
 };
+/**
+ * The resolved configuration of the preprocessor.
+ */
 export type ResolvedConfig = RecursiveRequired<Config>;
+/**
+ * The resolved configuration of a component.
+ */
 export type ResolvedComponentConfig = ResolvedConfig['symbols'];
 
 /**
@@ -79,7 +92,7 @@ export function resolveConfig(config: Config): ResolvedConfig {
   const resolvedConfig = {
     dataAttributes: {
       description: config.dataAttributes?.description ?? 'data-description',
-      global: config.dataAttributes?.global ?? 'data-doc',
+      global: config.dataAttributes?.global ?? 'data-documentize',
       events: config.dataAttributes?.events ?? 'data-symbol-events',
       props: config.dataAttributes?.props ?? 'data-symbol-props',
       slots: config.dataAttributes?.slots ?? 'data-symbol-slots',
@@ -129,18 +142,12 @@ export function resolveConfig(config: Config): ResolvedConfig {
  * Resolve the configuration of a component.
  */
 export function resolveComponentConfig(
+  attributes: Attributes,
   resolvedConfig: ResolvedConfig,
-  attributes: NamedNodeMap,
 ): ResolvedComponentConfig {
-  const events =
-    attributes.getNamedItem(resolvedConfig.dataAttributes.events)?.textContent ??
-    resolvedConfig.symbols.events;
-  const props =
-    attributes.getNamedItem(resolvedConfig.dataAttributes.props)?.textContent ??
-    resolvedConfig.symbols.props;
-  const slots =
-    attributes.getNamedItem(resolvedConfig.dataAttributes.slots)?.textContent ??
-    resolvedConfig.symbols.slots;
+  const events = attributes[resolvedConfig.dataAttributes.events] ?? resolvedConfig.symbols.events;
+  const props = attributes[resolvedConfig.dataAttributes.props] ?? resolvedConfig.symbols.props;
+  const slots = attributes[resolvedConfig.dataAttributes.slots] ?? resolvedConfig.symbols.slots;
 
   return {
     events,

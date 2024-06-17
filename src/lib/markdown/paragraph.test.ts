@@ -24,9 +24,9 @@ describe(Paragraph.name, () => {
     const text = null as string;
 
     // Act
-    const paragraph = () => new Paragraph(text);
+    const action = () => new Paragraph(text);
 
     // Assert
-    expect(paragraph).toThrowError(TypeError);
+    expect(action).toThrowError(TypeError);
   });
 });

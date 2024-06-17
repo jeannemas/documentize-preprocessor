@@ -64,7 +64,7 @@ type Config = {
     /**
      * The data-attribute of the meta tag used to identify the tag as the configuration for the preprocessor.
      *
-     * @default "data-doc"
+     * @default "data-documentize"
      */
     global?: DataAttribute;
     /**

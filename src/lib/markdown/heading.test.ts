@@ -37,8 +37,8 @@ describe(Heading.name, () => {
     }
 
     // Assert
-    for (const [, heading] of headings.entries()) {
-      expect(heading).toThrowError(TypeError);
+    for (const [, action] of headings.entries()) {
+      expect(action).toThrowError(TypeError);
     }
   });
 
@@ -55,8 +55,8 @@ describe(Heading.name, () => {
     }
 
     // Assert
-    for (const [, heading] of headings.entries()) {
-      expect(heading).toThrowError(TypeError);
+    for (const [, action] of headings.entries()) {
+      expect(action).toThrowError(TypeError);
     }
   });
 });

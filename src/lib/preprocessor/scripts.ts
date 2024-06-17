@@ -1,3 +1,7 @@
+import { parseAttributes, type Attributes } from './attributes.js';
+
+const scriptRegex = /(<script([^>]*)>([\s\S]*?)<\/script>)/g;
+
 /**
  * The script tag of a Svelte 4 component.
  */
@@ -5,7 +9,7 @@ export type Svelte4Script = {
   /**
    * The attributes of the script tag.
    */
-  attributes: Record<string, string>;
+  attributes: Attributes;
   /**
    * The content of the script tag.
    */
@@ -50,22 +54,13 @@ export function extractScriptNotContextModule(content: string): Svelte4Script | 
  * Extract the scripts from a Svelte 4 component.
  */
 export function extractScripts(content: string): Svelte4Script[] {
-  const scriptRegex = /(<script([^>]*)>([\s\S]*?)<\/script>)/g;
-  const attributeRegex = /(([a-zA-Z_-][a-zA-Z0-9_-]*)=(?:'([\s\S]*?)'|"([\s\S]*?)"))/g;
   const scripts: Svelte4Script[] = [];
 
   for (const execArray of content.matchAll(scriptRegex)) {
     const [, , rawAttributes, rawContent] = execArray;
-    const attributes: Record<string, string> = {};
-
-    for (const execArray of rawAttributes.matchAll(attributeRegex)) {
-      const [, , rawName, rawValue1, rawValue2] = execArray;
-
-      attributes[rawName] = rawValue1 || rawValue2 || '';
-    }
 
     scripts.push({
-      attributes,
+      attributes: parseAttributes(rawAttributes),
       content: rawContent,
     });
   }
