@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import * as Markdown from '$lib/markdown/index.js';
 import { generateRandomString, randomInt } from '$lib/test-utils.js';
 
-function generateRandomHeadingLevel(): Markdown.HeadingLevel {
+export function generateRandomHeadingLevel(): Markdown.HeadingLevel {
   const index = randomInt(0, Markdown.headingLevels.length);
   const headingLevel = Markdown.headingLevels[index];
 
@@ -25,6 +25,17 @@ describe(Markdown.Heading.name, () => {
       const maybeHeading = action();
 
       expect(maybeHeading).toBeInstanceOf(Markdown.Heading);
+    });
+
+    it('Should throw an error for an invalid heading level', () => {
+      // Arrange
+      const headingLevel = -1 as Markdown.HeadingLevel;
+
+      // Act
+      const action = () => new Markdown.Heading(headingLevel);
+
+      // Assert
+      expect(action).toThrowError(Error);
     });
   });
 

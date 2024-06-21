@@ -35,9 +35,7 @@ export class Table extends MarkdownNode {
 
     lines.push(
       `| ${columns.map((column) => column.asString()).join(' | ')} |`,
-      `| ${columns.map(({ alignment }) =>
-        alignment === 'left' ? ':--' : alignment === 'right' ? '--:' : '---',
-      )} |`,
+      `| ${columns.map(({ alignment }) => getStringFromAlignment(alignment)).join(' | ')} |`,
     );
 
     for (const row of rows) {
@@ -45,5 +43,18 @@ export class Table extends MarkdownNode {
     }
 
     return `\n${lines.join('\n').trim()}\n\n`;
+
+    function getStringFromAlignment(alignment: Markdown.Table.ColumnAlignment): string {
+      switch (alignment) {
+        case 'left':
+          return ':--';
+
+        case 'right':
+          return '--:';
+
+        default:
+          throw new Error(`Invalid or unsupported column alignment: "${alignment}".`);
+      }
+    }
   }
 }

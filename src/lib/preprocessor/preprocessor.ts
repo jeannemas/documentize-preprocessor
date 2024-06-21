@@ -5,13 +5,13 @@ import { Project } from 'ts-morph';
 import { resolveComponentConfig, resolveConfig, type Config } from './config.js';
 import { PREPROCESSOR_NAME } from './constants.js';
 import { resolveDescription } from './description.js';
-import { resolveSvelte4Events } from './events.js';
+import { resolveSvelte4Events, resolveSvelte4EventsNode } from './events.js';
 import { Logger } from './logger.js';
 import { buildMarkdown } from './markdown.js';
 import { extractMeta } from './meta.js';
-import { resolveSvelte4Props } from './props.js';
+import { resolveSvelte4Props, resolveSvelte4PropsNode } from './props.js';
 import { extractScriptContextModule, extractScriptNotContextModule } from './scripts.js';
-import { resolveSvelte4Slots } from './slots.js';
+import { resolveSvelte4Slots, resolveSvelte4SlotsNode } from './slots.js';
 
 /**
  * A Svelte preprocessor that generates documentation for Svelte 4 components.
@@ -97,7 +97,7 @@ import { resolveSvelte4Slots } from './slots.js';
  */
 export default function documentizePreprocessor(config: Config = {}): PreprocessorGroup {
   const resolvedConfig = resolveConfig(config);
-  const logger = new Logger(resolvedConfig.debug);
+  const logger = new Logger(console, resolvedConfig.debug);
   const project = new Project();
 
   logger.info('Global config', resolvedConfig);
@@ -125,15 +125,9 @@ export default function documentizePreprocessor(config: Config = {}): Preprocess
         sourceFileContent,
       );
       const description = resolveDescription(meta.attributes, resolvedConfig);
-      const eventsNode =
-        sourceFile.getTypeAlias(resolvedComponentConfig.events) ??
-        sourceFile.getInterface(resolvedComponentConfig.events);
-      const propsNode =
-        sourceFile.getTypeAlias(resolvedComponentConfig.props) ??
-        sourceFile.getInterface(resolvedComponentConfig.props);
-      const slotsNode =
-        sourceFile.getTypeAlias(resolvedComponentConfig.slots) ??
-        sourceFile.getInterface(resolvedComponentConfig.slots);
+      const eventsNode = resolveSvelte4EventsNode(resolvedComponentConfig.events, sourceFile);
+      const propsNode = resolveSvelte4PropsNode(resolvedComponentConfig.props, sourceFile);
+      const slotsNode = resolveSvelte4SlotsNode(resolvedComponentConfig.slots, sourceFile);
       const svelte4Events = eventsNode ? resolveSvelte4Events(eventsNode) : [];
       const svelte4Props = propsNode ? resolveSvelte4Props(propsNode) : [];
       const svelte4Slots = slotsNode ? resolveSvelte4Slots(slotsNode) : [];

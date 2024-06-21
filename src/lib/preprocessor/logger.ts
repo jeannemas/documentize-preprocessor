@@ -8,6 +8,10 @@ import { PREPROCESSOR_NAME } from './constants.js';
  */
 export class Logger {
   /**
+   * The console to log to.
+   */
+  #console: Console;
+  /**
    * Whether the logger is in debug mode.
    */
   #debug: boolean;
@@ -15,9 +19,11 @@ export class Logger {
   /**
    * Create a new logger.
    *
+   * @param console The console to log to.
    * @param debug Whether the logger is in debug mode.
    */
-  constructor(debug: boolean) {
+  constructor(console: Console, debug: boolean) {
+    this.#console = console;
     this.#debug = debug;
   }
 
@@ -25,7 +31,7 @@ export class Logger {
    * Log to the console with the `error` level.
    */
   error(...args: unknown[]): void {
-    console.error(`[${chalk.bgRed(this.#name)}]`, ...args);
+    this.#console.error(`[${chalk.bgRed(this.#name)}]`, ...args);
   }
 
   /**
@@ -39,7 +45,7 @@ export class Logger {
       return;
     }
 
-    console.info(`[${chalk.bgBlue(this.#name)}]`, ...args);
+    this.#console.info(`[${chalk.bgBlue(this.#name)}]`, ...args);
   }
 
   /**
@@ -53,7 +59,7 @@ export class Logger {
       return;
     }
 
-    console.warn(`[${chalk.bgYellow(this.#name)}]`, ...args);
+    this.#console.warn(`[${chalk.bgYellow(this.#name)}]`, ...args);
   }
 
   /**

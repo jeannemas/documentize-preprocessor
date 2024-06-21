@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
 
+import type { Attributes } from './attributes.js';
 import {
   defaultDebug,
   defaultDescriptionDataAttribute,
@@ -14,12 +15,13 @@ import {
   resolveComponentConfig,
   resolveConfig,
   type Config,
+  type DataAttribute,
 } from './config.js';
 
 describe(resolveComponentConfig.name, () => {
   it('Should resolve using the default config', () => {
     // Arrange
-    const attributes = {};
+    const attributes = {} satisfies Attributes;
     const resolvedConfig = resolveConfig({});
 
     // Act
@@ -38,7 +40,7 @@ describe(resolveComponentConfig.name, () => {
       'data-symbol-events': `events-${suffix}`,
       'data-symbol-props': `props-${suffix}`,
       'data-symbol-slots': `slots-${suffix}`,
-    };
+    } satisfies Attributes;
     const resolvedConfig = resolveConfig({});
 
     // Act
@@ -54,7 +56,7 @@ describe(resolveComponentConfig.name, () => {
 describe(resolveConfig.name, () => {
   it('Should resolve using the default config', () => {
     // Arrange
-    const config = {};
+    const config = {} satisfies Config;
 
     // Act
     const resolvedConfig = resolveConfig(config);
@@ -113,5 +115,53 @@ describe(resolveConfig.name, () => {
     expect(resolvedConfig.symbols).toHaveProperty('events', config.symbols.events);
     expect(resolvedConfig.symbols).toHaveProperty('props', config.symbols.props);
     expect(resolvedConfig.symbols).toHaveProperty('slots', config.symbols.slots);
+  });
+
+  it('Should throw when invalid data-attributes are provided', () => {
+    // Arrange
+    const configWithInvalidDescriptionDataAttribute = {
+      dataAttributes: {
+        description: 'invalid-description' as DataAttribute,
+      },
+    } satisfies Config;
+    const configWithInvalidEventsDataAttribute = {
+      dataAttributes: {
+        events: 'invalid-events' as DataAttribute,
+      },
+    } satisfies Config;
+    const configWithInvalidGlobalDataAttribute = {
+      dataAttributes: {
+        global: 'invalid-global' as DataAttribute,
+      },
+    } satisfies Config;
+    const configWithInvalidPropsDataAttribute = {
+      dataAttributes: {
+        props: 'invalid-props' as DataAttribute,
+      },
+    } satisfies Config;
+    const configWithInvalidSlotsDataAttribute = {
+      dataAttributes: {
+        slots: 'invalid-slots' as DataAttribute,
+      },
+    } satisfies Config;
+
+    // Act
+    const actionWithInvalidDescriptionDataAttribute = () =>
+      resolveConfig(configWithInvalidDescriptionDataAttribute);
+    const actionWithInvalidEventsDataAttribute = () =>
+      resolveConfig(configWithInvalidEventsDataAttribute);
+    const actionWithInvalidGlobalDataAttribute = () =>
+      resolveConfig(configWithInvalidGlobalDataAttribute);
+    const actionWithInvalidPropsDataAttribute = () =>
+      resolveConfig(configWithInvalidPropsDataAttribute);
+    const actionWithInvalidSlotsDataAttribute = () =>
+      resolveConfig(configWithInvalidSlotsDataAttribute);
+
+    // Assert
+    expect(actionWithInvalidDescriptionDataAttribute).toThrowError(Error);
+    expect(actionWithInvalidEventsDataAttribute).toThrowError(Error);
+    expect(actionWithInvalidGlobalDataAttribute).toThrowError(Error);
+    expect(actionWithInvalidPropsDataAttribute).toThrowError(Error);
+    expect(actionWithInvalidSlotsDataAttribute).toThrowError(Error);
   });
 });

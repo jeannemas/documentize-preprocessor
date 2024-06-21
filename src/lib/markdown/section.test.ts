@@ -1,14 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
 import * as Markdown from '$lib/markdown/index.js';
-import { generateRandomString, randomInt } from '$lib/test-utils.js';
+import { generateRandomString } from '$lib/test-utils.js';
 
-function generateRandomHeadingLevel(): Markdown.HeadingLevel {
-  const index = randomInt(0, Markdown.headingLevels.length);
-  const headingLevel = Markdown.headingLevels[index];
-
-  return headingLevel;
-}
+import { generateRandomHeadingLevel } from './heading.test.js';
 
 describe(Markdown.Section.name, () => {
   describe('constructor', () => {

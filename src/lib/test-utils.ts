@@ -5,12 +5,12 @@ export { randomInt } from 'node:crypto';
 /**
  * Generate a random string.
  *
- * @param alphabeat The alphabeat to use. Default is [a-zA-Z0-9].
+ * @param alphabeat The alphabeat to use. Default is [a-zA-Z].
  * @param length The length of the string. Default is `16`.
  * @returns The random string.
  */
 export function generateRandomString(
-  alphabeat: string = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
+  alphabeat: string = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
   length: number = 16,
 ): string {
   const chars = [...new Set(alphabeat.split('')).values()];

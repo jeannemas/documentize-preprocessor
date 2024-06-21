@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import * as Markdown from '$lib/markdown/index.js';
 import { generateRandomString, randomInt } from '$lib/test-utils.js';
 
-function generateRandomAlignment(): Markdown.Table.ColumnAlignment {
+export function generateRandomAlignment(): Markdown.Table.ColumnAlignment {
   const index = randomInt(0, Markdown.Table.columnAlignments.length);
   const alignment = Markdown.Table.columnAlignments[index];
 
@@ -25,6 +25,17 @@ describe(Markdown.Table.Column.name, () => {
       const maybeColumn = action();
 
       expect(maybeColumn).toBeInstanceOf(Markdown.Table.Column);
+    });
+
+    it('Should throw an error for an invalid alignment', () => {
+      // Arrange
+      const alignment = '' as Markdown.Table.ColumnAlignment;
+
+      // Act
+      const action = () => new Markdown.Table.Column(alignment);
+
+      // Assert
+      expect(action).toThrowError(Error);
     });
   });
 
