@@ -1,4 +1,6 @@
-export * from './builder.js';
-export * from './heading.js';
-export * from './paragraph.js';
-export * from './table.js';
+export { Builder } from './builder.js';
+export { Heading, headingLevels, type HeadingLevel } from './heading.js';
+export { Paragraph } from './paragraph.js';
+export { Section } from './section.js';
+export * as Table from './table/index.js';
+export { Text } from './text.js';

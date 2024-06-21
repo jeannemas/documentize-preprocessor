@@ -1,19 +1,16 @@
-import { Container, type MarkdownNode } from './internal.js';
+import { ContainerNode, type MarkdownNode } from './internal.js';
 
-export class Builder extends Container {
-  /**
-   * Add nodes to the builder.
-   */
-  add(...nodes: MarkdownNode[]) {
-    this._nodes.push(...nodes);
-
-    return this;
-  }
-
+/**
+ * A builder for markdown documents.
+ */
+export class Builder extends ContainerNode<MarkdownNode> {
   /**
    * Convert the nodes to markdown
    */
-  toString() {
-    return this._nodes.map((node) => node.toString()).join('');
+  override asString(): string {
+    const nodes = this._nodes;
+    const markdown = nodes.map((node) => node.asString()).join('');
+
+    return `${markdown}`;
   }
 }

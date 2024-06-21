@@ -5,9 +5,9 @@ import { Project } from 'ts-morph';
 import { resolveComponentConfig, resolveConfig, type Config } from './config.js';
 import { PREPROCESSOR_NAME } from './constants.js';
 import { resolveDescription } from './description.js';
-import { buildDoc } from './doc.js';
 import { resolveSvelte4Events } from './events.js';
 import { Logger } from './logger.js';
+import { buildMarkdown } from './markdown.js';
 import { extractMeta } from './meta.js';
 import { resolveSvelte4Props } from './props.js';
 import { extractScriptContextModule, extractScriptNotContextModule } from './scripts.js';
@@ -170,8 +170,8 @@ export default function documentizePreprocessor(config: Config = {}): Preprocess
         svelte4Slots,
       );
 
-      const doc = buildDoc(svelte4Events, svelte4Props, svelte4Slots, description);
-      const comment = `<!--\n${doc.trim()}\n-->`;
+      const markdown = buildMarkdown(svelte4Events, svelte4Props, svelte4Slots, description);
+      const comment = `<!--\n${markdown}\n-->`;
       const newCode = content.replace(meta.regex, comment);
       const patchIsSuccessful = newCode.includes(comment);
 

@@ -10,46 +10,48 @@ function generateRandomHeadingLevel(): Markdown.HeadingLevel {
   return headingLevel;
 }
 
-describe(Markdown.Heading.name, () => {
+describe(Markdown.Section.name, () => {
   describe('constructor', () => {
     it('Should create a new instance', () => {
       // Arrange
-      const headingLevel = generateRandomHeadingLevel();
+      const heading = new Markdown.Heading(generateRandomHeadingLevel());
 
       // Act
-      const action = () => new Markdown.Heading(headingLevel);
+      const action = () => new Markdown.Section(heading);
 
       // Assert
       expect(action).not.toThrowError();
 
-      const maybeHeading = action();
+      const maybeSection = action();
 
-      expect(maybeHeading).toBeInstanceOf(Markdown.Heading);
+      expect(maybeSection).toBeInstanceOf(Markdown.Section);
     });
   });
 
-  describe('add' satisfies keyof Markdown.Heading, () => {
+  describe('add' satisfies keyof Markdown.Section, () => {
     it('Should return the instance', () => {
       // Arrange
       const heading = new Markdown.Heading(generateRandomHeadingLevel());
+      const section = new Markdown.Section(heading);
       const text = new Markdown.Text(generateRandomString());
 
       // Act
-      const maybeHeading = heading.add(text);
+      const maybeSection = section.add(text);
 
       // Assert
-      expect(maybeHeading).toBeInstanceOf(Markdown.Heading);
-      expect(maybeHeading).toBe(heading);
+      expect(maybeSection).toBeInstanceOf(Markdown.Section);
+      expect(maybeSection).toBe(section);
     });
   });
 
-  describe('asString' satisfies keyof Markdown.Heading, () => {
+  describe('asString' satisfies keyof Markdown.Section, () => {
     it('Should return a string', () => {
       // Arrange
       const heading = new Markdown.Heading(generateRandomHeadingLevel());
+      const section = new Markdown.Section(heading);
 
       // Act
-      const markdown = heading.asString();
+      const markdown = section.asString();
 
       // Assert
       expect(markdown).toBeTypeOf('string');

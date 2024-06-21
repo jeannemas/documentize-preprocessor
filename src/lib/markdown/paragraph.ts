@@ -1,31 +1,16 @@
-import { MarkdownNode } from './internal.js';
+import { ContainerNode, type InlineNode } from './internal.js';
 
 /**
  * A paragraph in a markdown document.
  */
-export class Paragraph extends MarkdownNode {
-  /**
-   * The text of the paragraph.
-   */
-  #text: string;
-
-  /**
-   * Create a new paragraph.
-   */
-  constructor(text: string) {
-    super();
-
-    if (typeof text !== 'string') {
-      throw new TypeError(`Invalid paragraph text: "${text}". Expected a string.`);
-    }
-
-    this.#text = text;
-  }
-
+export class Paragraph extends ContainerNode<InlineNode> {
   /**
    * Convert the paragraph to a string.
    */
-  toString() {
-    return `\n${this.#text}\n\n`;
+  override asString(): string {
+    const nodes = this._nodes;
+    const markdown = nodes.map((node) => node.asString()).join(' ');
+
+    return `\n${markdown.trim()}\n\n`;
   }
 }

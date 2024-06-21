@@ -24,7 +24,7 @@ export class Logger {
   /**
    * Log to the console with the `error` level.
    */
-  error(...args: unknown[]) {
+  error(...args: unknown[]): void {
     console.error(`[${chalk.bgRed(this.#name)}]`, ...args);
   }
 
@@ -33,7 +33,7 @@ export class Logger {
    *
    * If the logger is not in debug mode, this method does nothing.
    */
-  info(...args: unknown[]) {
+  info(...args: unknown[]): void {
     if (!this.#debug) {
       // We only want to log in debug mode
       return;
@@ -47,7 +47,7 @@ export class Logger {
    *
    * If the logger is not in debug mode, this method does nothing.
    */
-  warn(...args: unknown[]) {
+  warn(...args: unknown[]): void {
     if (!this.#debug) {
       // We only want to log in debug mode
       return;
@@ -59,7 +59,7 @@ export class Logger {
   /**
    * Get the name of the preprocessor.
    */
-  get #name() {
+  get #name(): string {
     return `${PREPROCESSOR_NAME}@${version}`;
   }
 }

@@ -1,22 +1,42 @@
-export class MarkdownNode {
+/**
+ * A markdown node.
+ */
+export abstract class MarkdownNode {
   /**
    * Convert the node to a string.
    */
-  toString(): string {
-    throw new Error('Not implemented');
-  }
+  abstract asString(): string;
 }
-export class Container extends MarkdownNode {
+
+/**
+ * A container node.
+ */
+export abstract class ContainerNode<TNodes extends MarkdownNode> extends MarkdownNode {
   /**
-   * The nodes in the container.
+   * The child nodes in the block.
    */
-  protected _nodes: MarkdownNode[] = [];
+  protected _nodes: TNodes[] = [];
 
   /**
-   * Add nodes to the container.
+   * Create a new container node.
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  add(...nodes: MarkdownNode[]): this {
-    throw new Error('Not implemented');
+  constructor(...nodes: TNodes[]) {
+    super();
+
+    this.add(...nodes);
+  }
+
+  /**
+   * Add nodes to the block.
+   */
+  add(...nodes: TNodes[]): this {
+    this._nodes.push(...nodes);
+
+    return this;
   }
 }
+
+/**
+ * An inline node.
+ */
+export abstract class InlineNode extends MarkdownNode {}

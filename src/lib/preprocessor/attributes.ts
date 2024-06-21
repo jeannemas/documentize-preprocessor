@@ -24,7 +24,7 @@ export function parseAttributes(attributesString: string): Attributes {
     const [, , rawName, rawValue1, rawValue2] = execArray;
 
     if (rawName in attributes) {
-      throw new Error(`Duplicate attribute "${rawName}".`);
+      throw new Error(`Duplicate attribute "${rawName}". This is not valid HTML.`);
     }
 
     attributes[rawName] = rawValue1 || rawValue2 || defaultAttributeValue;
