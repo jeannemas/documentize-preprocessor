@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
+import { generateRandomString } from '$lib/test-utils.js';
+
+import { Attribute } from './attributes.js';
 import { resolveConfig } from './config.js';
 import { defaultDescription, resolveDescription } from './description.js';
 
@@ -7,7 +10,7 @@ describe(resolveDescription.name, () => {
   it('Should resolve using the default description', () => {
     // Arrange
     const resolvedConfig = resolveConfig({});
-    const attributes = {};
+    const attributes = [] satisfies Attribute[];
 
     // Act
     const description = resolveDescription(attributes, resolvedConfig);
@@ -19,14 +22,16 @@ describe(resolveDescription.name, () => {
   it('Should resolve using the provided description', () => {
     // Arrange
     const resolvedConfig = resolveConfig({});
-    const attributes = {
-      [resolvedConfig.dataAttributes.description]: 'This is a description',
-    };
+    const descriptionAttribute = new Attribute(
+      resolvedConfig.dataAttributes.description,
+      generateRandomString(),
+    );
+    const attributes = [descriptionAttribute] satisfies Attribute[];
 
     // Act
     const description = resolveDescription(attributes, resolvedConfig);
 
     // Assert
-    expect(description).toEqual(attributes[resolvedConfig.dataAttributes.description]);
+    expect(description).toEqual(descriptionAttribute.value);
   });
 });

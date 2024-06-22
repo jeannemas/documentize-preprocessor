@@ -1,6 +1,6 @@
 import type { RecursiveRequired } from '@sveltejs/kit';
 
-import type { Attributes } from './attributes.js';
+import type { Attribute } from './attributes.js';
 
 const dataAttributeRegex = /^data-[a-zA-Z_-][a-zA-Z0-9_-]*$/;
 
@@ -127,12 +127,18 @@ export type ResolvedConfig = RecursiveRequired<Config>;
  * Resolve the configuration of a component.
  */
 export function resolveComponentConfig(
-  attributes: Attributes,
+  attributes: Attribute[],
   resolvedConfig: ResolvedConfig,
 ): ResolvedComponentConfig {
-  const events = attributes[resolvedConfig.dataAttributes.events] ?? resolvedConfig.symbols.events;
-  const props = attributes[resolvedConfig.dataAttributes.props] ?? resolvedConfig.symbols.props;
-  const slots = attributes[resolvedConfig.dataAttributes.slots] ?? resolvedConfig.symbols.slots;
+  const events =
+    attributes.find(({ name }) => name === resolvedConfig.dataAttributes.events)?.value ??
+    resolvedConfig.symbols.events;
+  const props =
+    attributes.find(({ name }) => name === resolvedConfig.dataAttributes.props)?.value ??
+    resolvedConfig.symbols.props;
+  const slots =
+    attributes.find(({ name }) => name === resolvedConfig.dataAttributes.slots)?.value ??
+    resolvedConfig.symbols.slots;
 
   return {
     events,

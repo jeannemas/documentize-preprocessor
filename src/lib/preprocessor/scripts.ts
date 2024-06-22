@@ -1,20 +1,28 @@
-import { parseAttributes, type Attributes } from './attributes.js';
+import { parseAttributes, type Attribute } from './attributes.js';
 
 const scriptRegex = /(<script([^>]*)>([\s\S]*?)<\/script>)/g;
 
 /**
  * The script tag of a Svelte 4 component.
  */
-export type Svelte4Script = {
+export class Svelte4Script {
   /**
    * The attributes of the script tag.
    */
-  attributes: Attributes;
+  readonly attributes: Attribute[];
   /**
    * The content of the script tag.
    */
-  content: string;
-};
+  readonly content: string;
+
+  /**
+   * Create a new script tag.
+   */
+  constructor(attributes: Attribute[], content: string) {
+    this.attributes = attributes;
+    this.content = content;
+  }
+}
 
 /**
  * Extract the script tag with the `context="module"` attribute.
@@ -24,7 +32,9 @@ export type Svelte4Script = {
  */
 export function extractScriptContextModule(content: string): Svelte4Script | null {
   const scripts = extractScripts(content);
-  const scriptsContextModule = scripts.filter((info) => info.attributes.context === 'module');
+  const scriptsContextModule = scripts.filter((info) =>
+    info.attributes.some(({ name, value }) => name === 'context' && value === 'module'),
+  );
 
   if (scriptsContextModule.length > 1) {
     throw new Error('Multiple scripts with context module found. This is invalid in Svelte 4.');
@@ -41,7 +51,9 @@ export function extractScriptContextModule(content: string): Svelte4Script | nul
  */
 export function extractScriptNotContextModule(content: string): Svelte4Script | null {
   const scripts = extractScripts(content);
-  const scriptsNotContextModule = scripts.filter((info) => info.attributes.context !== 'module');
+  const scriptsNotContextModule = scripts.filter(
+    (info) => !info.attributes.some(({ name, value }) => name === 'context' && value === 'module'),
+  );
 
   if (scriptsNotContextModule.length > 1) {
     throw new Error('Multiple scripts found. This is invalid in Svelte 4.');
@@ -59,10 +71,7 @@ export function extractScripts(content: string): Svelte4Script[] {
   for (const execArray of content.matchAll(scriptRegex)) {
     const [, , rawAttributes, rawContent] = execArray;
 
-    scripts.push({
-      attributes: parseAttributes(rawAttributes),
-      content: rawContent,
-    });
+    scripts.push(new Svelte4Script(parseAttributes(rawAttributes), rawContent));
   }
 
   return scripts;

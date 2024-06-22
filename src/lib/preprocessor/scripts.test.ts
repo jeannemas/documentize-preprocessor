@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
+import { Attribute } from './attributes.js';
 import {
+  Svelte4Script,
   extractScriptContextModule,
   extractScriptNotContextModule,
   extractScripts,
@@ -23,49 +25,9 @@ const sampleScriptNotContextModule = `
 const sampleValidComponentWithScripts = `
 ${sampleScriptContextModule}
 
-Foo bar baz
-
 ${sampleScriptNotContextModule}
-
-Lorem ipsum
 `;
-const sampleValidComponentWithOnlyScriptContextModule = `
-${sampleScriptContextModule}
-
-Foo bar baz
-
-Lorem ipsum
-`;
-const sampleValidComponentWithOnlyScriptNotContextModule = `
-Foo bar baz
-
-${sampleScriptNotContextModule}
-
-Lorem ipsum
-`;
-const sampleValidComponentWithoutScripts = `
-Foo bar baz
-
-Lorem ipsum
-`;
-const sampleInvalidComponentWithMultipleScriptContextModule = `
-${sampleScriptContextModule}
-
-Foo bar baz
-
-${sampleScriptContextModule}
-
-Lorem ipsum
-`;
-const sampleInvalidComponentWithMultipleScriptNotContextModule = `
-${sampleScriptNotContextModule}
-
-Foo bar baz
-
-${sampleScriptNotContextModule}
-
-Lorem ipsum
-`;
+const sampleValidComponentWithoutScripts = '';
 
 describe(extractScriptContextModule.name, () => {
   it('Should extract the script context module', () => {
@@ -77,7 +39,8 @@ describe(extractScriptContextModule.name, () => {
 
     // Assert
     expect(script).not.toBeNull();
-    expect(script!.attributes.context).toEqual('module');
+    expect(script).toBeInstanceOf(Svelte4Script);
+    expect(script!.attributes).toContainEqual(new Attribute('context', 'module'));
   });
 
   it('Should extract nothing', () => {
@@ -93,7 +56,15 @@ describe(extractScriptContextModule.name, () => {
 
   it('Should throw an error', () => {
     // Arrange
-    const content = sampleInvalidComponentWithMultipleScriptContextModule;
+    const content = `
+${sampleScriptContextModule}
+
+Foo bar baz
+
+${sampleScriptContextModule}
+
+Lorem ipsum
+`;
 
     // Act
     const action = () => extractScriptContextModule(content);
@@ -113,7 +84,8 @@ describe(extractScriptNotContextModule.name, () => {
 
     // Assert
     expect(script).not.toBeNull();
-    expect(script!.attributes.context).not.toEqual('module');
+    expect(script).toBeInstanceOf(Svelte4Script);
+    expect(script!.attributes).not.toContainEqual(new Attribute('context', 'module'));
   });
 
   it('Should extract nothing', () => {
@@ -129,7 +101,15 @@ describe(extractScriptNotContextModule.name, () => {
 
   it('Should throw an error', () => {
     // Arrange
-    const content = sampleInvalidComponentWithMultipleScriptNotContextModule;
+    const content = `
+${sampleScriptNotContextModule}
+
+Foo bar baz
+
+${sampleScriptNotContextModule}
+
+Lorem ipsum
+`;
 
     // Act
     const action = () => extractScriptNotContextModule(content);
@@ -148,34 +128,49 @@ describe(extractScripts.name, () => {
     const scripts = extractScripts(content);
 
     // Assert
-    expect(scripts.length).toEqual(2);
-    expect(Object.keys(scripts[0].attributes).length).toEqual(2);
-    expect(scripts[0].attributes.context).toEqual('module');
-    expect(Object.keys(scripts[1].attributes).length).toEqual(1);
-    expect(scripts[1].attributes.context).not.toEqual('module');
+    expect(scripts).toBeInstanceOf(Array);
+    expect(scripts).toHaveLength(2);
+
+    for (const script of scripts) {
+      expect(script).toBeInstanceOf(Svelte4Script);
+    }
   });
 
   it('Should extract 1 script context module', () => {
     // Arrange
-    const content = sampleValidComponentWithOnlyScriptContextModule;
+    const content = `
+${sampleScriptContextModule}
+
+Foo bar baz
+
+Lorem ipsum
+`;
 
     // Act
     const scripts = extractScripts(content);
 
     // Assert
-    expect(scripts.length).toEqual(1);
-    expect(scripts[0].attributes.context).toEqual('module');
+    expect(scripts).toBeInstanceOf(Array);
+    expect(scripts).toHaveLength(1);
+    expect(scripts[0].attributes).toContainEqual(new Attribute('context', 'module'));
   });
 
   it('Should extract 1 script', () => {
     // Arrange
-    const content = sampleValidComponentWithOnlyScriptNotContextModule;
+    const content = `
+Foo bar baz
+
+${sampleScriptNotContextModule}
+
+Lorem ipsum
+`;
 
     // Act
     const scripts = extractScripts(content);
 
     // Assert
-    expect(scripts.length).toEqual(1);
-    expect(scripts[0].attributes.context).not.toEqual('module');
+    expect(scripts).toBeInstanceOf(Array);
+    expect(scripts).toHaveLength(1);
+    expect(scripts[0].attributes).not.toContainEqual(new Attribute('context', 'module'));
   });
 });

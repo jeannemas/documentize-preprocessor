@@ -9,7 +9,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import { generateRandomString, randomInt } from '$lib/test-utils.js';
 
-import { resolveSvelte4Props, resolveSvelte4PropsNode, type Svelte4Prop } from './props.js';
+import { Svelte4Prop, resolveSvelte4Props, resolveSvelte4PropsNode } from './props.js';
 
 export function addPropsAsInterfaceDeclaration(
   props: Svelte4Prop[],
@@ -52,9 +52,7 @@ export function generateRandomProps(propsCount: number): Svelte4Prop[] {
   const props: Svelte4Prop[] = [];
 
   for (let i = 0; i < propsCount; i++) {
-    props.push({
-      name: generateRandomString(),
-    });
+    props.push(new Svelte4Prop(generateRandomString()));
   }
 
   return props;
@@ -91,6 +89,8 @@ describe(resolveSvelte4Props.name, () => {
     }
 
     for (const maybeProp of maybeProps) {
+      expect(maybeProp).toBeInstanceOf(Svelte4Prop);
+
       const matchingProp = props.find((prop) => prop.name === maybeProp.name) ?? null;
 
       expect(matchingProp).not.toBeNull();
@@ -117,6 +117,8 @@ describe(resolveSvelte4Props.name, () => {
     }
 
     for (const maybeProp of maybeProps) {
+      expect(maybeProp).toBeInstanceOf(Svelte4Prop);
+
       const matchingProp = props.find((prop) => prop.name === maybeProp.name) ?? null;
 
       expect(matchingProp).not.toBeNull();

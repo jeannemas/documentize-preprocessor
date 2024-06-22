@@ -9,7 +9,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import { generateRandomString, randomInt } from '$lib/test-utils.js';
 
-import { resolveSvelte4Events, resolveSvelte4EventsNode, type Svelte4Event } from './events.js';
+import { Svelte4Event, resolveSvelte4Events, resolveSvelte4EventsNode } from './events.js';
 
 export function addEventsAsInterfaceDeclaration(
   events: Svelte4Event[],
@@ -52,9 +52,7 @@ export function generateRandomEvents(eventsCount: number): Svelte4Event[] {
   const events: Svelte4Event[] = [];
 
   for (let i = 0; i < eventsCount; i++) {
-    events.push({
-      name: generateRandomString(),
-    });
+    events.push(new Svelte4Event(generateRandomString()));
   }
 
   return events;
@@ -91,6 +89,8 @@ describe(resolveSvelte4Events.name, () => {
     }
 
     for (const maybeEvent of maybeEvents) {
+      expect(maybeEvent).toBeInstanceOf(Svelte4Event);
+
       const matchingEvent = events.find((event) => event.name === maybeEvent.name) ?? null;
 
       expect(matchingEvent).not.toBeNull();
@@ -117,6 +117,8 @@ describe(resolveSvelte4Events.name, () => {
     }
 
     for (const maybeEvent of maybeEvents) {
+      expect(maybeEvent).toBeInstanceOf(Svelte4Event);
+
       const matchingEvent = events.find((event) => event.name === maybeEvent.name) ?? null;
 
       expect(matchingEvent).not.toBeNull();

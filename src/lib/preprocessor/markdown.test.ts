@@ -76,9 +76,9 @@ describe(buildMarkdown.name, () => {
     const markdown = buildMarkdown(events, props, slots, description);
 
     // Assert
-    expect(typeof markdown).toBe('string');
-    expect(markdown.includes(prefix)).toBe(true);
-    expect(markdown.includes(description)).toBe(true);
+    expect(markdown).toBeTypeOf('string');
+    expect(markdown).toContain(prefix);
+    expect(markdown).toContain(description);
   });
 
   it('Should build the documentation with no events', () => {
@@ -185,17 +185,17 @@ describe(buildMarkdown.name, () => {
     const markdown = buildMarkdown(events, props, slots, description);
 
     // Assert
-    expect(markdown.includes(emptyEventsText)).toBe(false);
-    expect(markdown.includes(eventsText)).toBe(true);
+    expect(markdown).not.toContain(emptyEventsText);
+    expect(markdown).toContain(eventsText);
 
     for (const event of events) {
-      expect(markdown.includes(event.name)).toBe(true);
+      expect(markdown).toContain(event.name);
     }
 
-    expect(markdown.includes(emptyPropsText)).toBe(true);
-    expect(markdown.includes(propsText)).toBe(false);
-    expect(markdown.includes(emptySlotsText)).toBe(true);
-    expect(markdown.includes(slotsText)).toBe(false);
+    expect(markdown).toContain(emptyPropsText);
+    expect(markdown).not.toContain(propsText);
+    expect(markdown).toContain(emptySlotsText);
+    expect(markdown).not.toContain(slotsText);
   });
 
   it('Should build the documentation with only props', () => {
@@ -209,17 +209,17 @@ describe(buildMarkdown.name, () => {
     const markdown = buildMarkdown(events, props, slots, description);
 
     // Assert
-    expect(markdown.includes(emptyEventsText)).toBe(true);
-    expect(markdown.includes(eventsText)).toBe(false);
-    expect(markdown.includes(emptyPropsText)).toBe(false);
-    expect(markdown.includes(propsText)).toBe(true);
+    expect(markdown).toContain(emptyEventsText);
+    expect(markdown).not.toContain(eventsText);
+    expect(markdown).not.toContain(emptyPropsText);
+    expect(markdown).toContain(propsText);
 
     for (const prop of props) {
-      expect(markdown.includes(prop.name)).toBe(true);
+      expect(markdown).toContain(prop.name);
     }
 
-    expect(markdown.includes(emptySlotsText)).toBe(true);
-    expect(markdown.includes(slotsText)).toBe(false);
+    expect(markdown).toContain(emptySlotsText);
+    expect(markdown).not.toContain(slotsText);
   });
 
   it('Should build the documentation with only slots', () => {
@@ -233,18 +233,18 @@ describe(buildMarkdown.name, () => {
     const markdown = buildMarkdown(events, props, slots, description);
 
     // Assert
-    expect(markdown.includes(emptyEventsText)).toBe(true);
-    expect(markdown.includes(eventsText)).toBe(false);
-    expect(markdown.includes(emptyPropsText)).toBe(true);
-    expect(markdown.includes(propsText)).toBe(false);
-    expect(markdown.includes(emptySlotsText)).toBe(false);
-    expect(markdown.includes(slotsText)).toBe(true);
+    expect(markdown).toContain(emptyEventsText);
+    expect(markdown).not.toContain(eventsText);
+    expect(markdown).toContain(emptyPropsText);
+    expect(markdown).not.toContain(propsText);
+    expect(markdown).not.toContain(emptySlotsText);
+    expect(markdown).toContain(slotsText);
 
     for (const slot of slots) {
-      expect(markdown.includes(slot.name)).toBe(true);
+      expect(markdown).toContain(slot.name);
 
       for (const property of slot.properties) {
-        expect(markdown.includes(property.name)).toBe(true);
+        expect(markdown).toContain(property.name);
       }
     }
   });
@@ -260,11 +260,11 @@ describe(buildMarkdown.name, () => {
     const markdown = buildMarkdown(events, props, slots, description);
 
     // Assert
-    expect(markdown.includes(emptyEventsText)).toBe(true);
-    expect(markdown.includes(eventsText)).toBe(false);
-    expect(markdown.includes(emptyPropsText)).toBe(true);
-    expect(markdown.includes(propsText)).toBe(false);
-    expect(markdown.includes(emptySlotsText)).toBe(true);
-    expect(markdown.includes(slotsText)).toBe(false);
+    expect(markdown).toContain(emptyEventsText);
+    expect(markdown).not.toContain(eventsText);
+    expect(markdown).toContain(emptyPropsText);
+    expect(markdown).not.toContain(propsText);
+    expect(markdown).toContain(emptySlotsText);
+    expect(markdown).not.toContain(slotsText);
   });
 });

@@ -10,10 +10,10 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { generateRandomString, randomInt } from '$lib/test-utils.js';
 
 import {
+  Svelte4Slot,
+  Svelte4SlotProperty,
   resolveSvelte4Slots,
   resolveSvelte4SlotsNode,
-  type Svelte4Slot,
-  type Svelte4SlotProperty,
 } from './slots.js';
 
 export function addSlotsAsInterfaceDeclaration(
@@ -66,9 +66,7 @@ export function generateRandomSlotProperty(propertyCount: number): Svelte4SlotPr
   const properties: Svelte4SlotProperty[] = [];
 
   for (let i = 0; i < propertyCount; i++) {
-    properties.push({
-      name: generateRandomString(),
-    });
+    properties.push(new Svelte4SlotProperty(generateRandomString()));
   }
 
   return properties;
@@ -78,10 +76,7 @@ export function generateRandomSlots(slotsCount: number, propertyCount: number): 
   const slots: Svelte4Slot[] = [];
 
   for (let i = 0; i < slotsCount; i++) {
-    slots.push({
-      name: generateRandomString(),
-      properties: generateRandomSlotProperty(propertyCount),
-    });
+    slots.push(new Svelte4Slot(generateRandomString(), generateRandomSlotProperty(propertyCount)));
   }
 
   return slots;
@@ -118,6 +113,8 @@ describe(resolveSvelte4Slots.name, () => {
     }
 
     for (const maybeSlot of maybeSlots) {
+      expect(maybeSlot).toBeInstanceOf(Svelte4Slot);
+
       const matchingSlot = slots.find((slot) => slot.name === maybeSlot.name) ?? null;
 
       expect(matchingSlot).not.toBeNull();
@@ -144,6 +141,8 @@ describe(resolveSvelte4Slots.name, () => {
     }
 
     for (const maybeSlot of maybeSlots) {
+      expect(maybeSlot).toBeInstanceOf(Svelte4Slot);
+
       const matchingSlot = slots.find((slot) => slot.name === maybeSlot.name) ?? null;
 
       expect(matchingSlot).not.toBeNull();

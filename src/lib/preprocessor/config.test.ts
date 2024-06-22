@@ -1,7 +1,8 @@
-import { randomUUID } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
 
-import type { Attributes } from './attributes.js';
+import { generateRandomString } from '$lib/test-utils.js';
+
+import { Attribute } from './attributes.js';
 import {
   defaultDebug,
   defaultDescriptionDataAttribute,
@@ -21,7 +22,7 @@ import {
 describe(resolveComponentConfig.name, () => {
   it('Should resolve using the default config', () => {
     // Arrange
-    const attributes = {} satisfies Attributes;
+    const attributes = [] satisfies Attribute[];
     const resolvedConfig = resolveConfig({});
 
     // Act
@@ -35,21 +36,28 @@ describe(resolveComponentConfig.name, () => {
 
   it('Should resolve using the provided config', () => {
     // Arrange
-    const suffix = randomUUID();
-    const attributes = {
-      'data-symbol-events': `events-${suffix}`,
-      'data-symbol-props': `props-${suffix}`,
-      'data-symbol-slots': `slots-${suffix}`,
-    } satisfies Attributes;
     const resolvedConfig = resolveConfig({});
+    const eventsAttribute = new Attribute(
+      resolvedConfig.dataAttributes.events,
+      generateRandomString(),
+    );
+    const propsAttribute = new Attribute(
+      resolvedConfig.dataAttributes.props,
+      generateRandomString(),
+    );
+    const slotsAttribute = new Attribute(
+      resolvedConfig.dataAttributes.slots,
+      generateRandomString(),
+    );
+    const attributes = [eventsAttribute, propsAttribute, slotsAttribute];
 
     // Act
     const componentConfig = resolveComponentConfig(attributes, resolvedConfig);
 
     // Assert
-    expect(componentConfig).toHaveProperty('events', attributes['data-symbol-events']);
-    expect(componentConfig).toHaveProperty('props', attributes['data-symbol-props']);
-    expect(componentConfig).toHaveProperty('slots', attributes['data-symbol-slots']);
+    expect(componentConfig).toHaveProperty('events', eventsAttribute.value);
+    expect(componentConfig).toHaveProperty('props', propsAttribute.value);
+    expect(componentConfig).toHaveProperty('slots', slotsAttribute.value);
   });
 });
 
@@ -80,20 +88,19 @@ describe(resolveConfig.name, () => {
 
   it('Should resolve using the provided config', () => {
     // Arrange
-    const suffix = randomUUID();
     const config = {
       dataAttributes: {
-        description: `data-description-${suffix}`,
-        events: `data-events-${suffix}`,
-        global: `data-global-${suffix}`,
-        props: `data-props-${suffix}`,
-        slots: `data-slots-${suffix}`,
+        description: `data-description-${generateRandomString()}`,
+        events: `data-${generateRandomString()}`,
+        global: `data-${generateRandomString()}`,
+        props: `data-${generateRandomString()}`,
+        slots: `data-${generateRandomString()}`,
       },
       debug: true,
       symbols: {
-        events: `events-${suffix}`,
-        props: `props-${suffix}`,
-        slots: `slots-${suffix}`,
+        events: generateRandomString(),
+        props: generateRandomString(),
+        slots: generateRandomString(),
       },
     } satisfies Config;
 
@@ -121,27 +128,27 @@ describe(resolveConfig.name, () => {
     // Arrange
     const configWithInvalidDescriptionDataAttribute = {
       dataAttributes: {
-        description: 'invalid-description' as DataAttribute,
+        description: `invalid-${generateRandomString()}` as DataAttribute,
       },
     } satisfies Config;
     const configWithInvalidEventsDataAttribute = {
       dataAttributes: {
-        events: 'invalid-events' as DataAttribute,
+        events: `invalid-${generateRandomString()}` as DataAttribute,
       },
     } satisfies Config;
     const configWithInvalidGlobalDataAttribute = {
       dataAttributes: {
-        global: 'invalid-global' as DataAttribute,
+        global: `invalid-${generateRandomString()}` as DataAttribute,
       },
     } satisfies Config;
     const configWithInvalidPropsDataAttribute = {
       dataAttributes: {
-        props: 'invalid-props' as DataAttribute,
+        props: `invalid-${generateRandomString()}` as DataAttribute,
       },
     } satisfies Config;
     const configWithInvalidSlotsDataAttribute = {
       dataAttributes: {
-        slots: 'invalid-slots' as DataAttribute,
+        slots: `invalid-${generateRandomString()}` as DataAttribute,
       },
     } satisfies Config;
 

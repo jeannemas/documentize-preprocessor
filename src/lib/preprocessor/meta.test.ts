@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { resolveConfig } from './config.js';
-import { extractMeta } from './meta.js';
+import { Meta, extractMeta } from './meta.js';
 
 const resolvedConfig = resolveConfig({});
 const sampleMeta = `
@@ -9,43 +9,33 @@ const sampleMeta = `
   ${resolvedConfig.dataAttributes.global}
 />
 `;
-const sampleValidComponentWithMeta = `
-Foo bar baz
-
-${sampleMeta}
-
-Lorem ipsum
-`;
-const sampleValidComponentWithoutMeta = `
-Foo bar baz
-
-Lorem ipsum
-`;
-const sampleInvalidComponentWithMultipleMeta = `
-${sampleMeta}
-
-Foo bar baz
-
-${sampleMeta}
-
-Lorem ipsum
-`;
 
 describe(extractMeta.name, () => {
   it('Should extract the meta', () => {
     // Arrange
-    const content = sampleValidComponentWithMeta;
+    const content = `
+Foo bar baz
+
+${sampleMeta}
+
+Lorem ipsum
+`;
 
     // Act
     const meta = extractMeta(content, resolvedConfig.dataAttributes.global);
 
     // Assert
     expect(meta).not.toBeNull();
+    expect(meta).toBeInstanceOf(Meta);
   });
 
   it('Should extract nothing', () => {
     // Arrange
-    const content = sampleValidComponentWithoutMeta;
+    const content = `
+Foo bar baz
+
+Lorem ipsum
+`;
 
     // Act
     const script = extractMeta(content, resolvedConfig.dataAttributes.global);
@@ -56,7 +46,15 @@ describe(extractMeta.name, () => {
 
   it('Should throw an error', () => {
     // Arrange
-    const content = sampleInvalidComponentWithMultipleMeta;
+    const content = `
+${sampleMeta}
+
+Foo bar baz
+
+${sampleMeta}
+
+Lorem ipsum
+`;
 
     // Act
     const action = () => extractMeta(content, resolvedConfig.dataAttributes.global);

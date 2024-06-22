@@ -8,26 +8,43 @@ const attributeRegex = /(([a-zA-Z_-][a-zA-Z0-9_-]*)(?:=(?:'([\s\S]*?)'|"([\s\S]*
 export const defaultAttributeValue = '';
 
 /**
- * Attributes of an element.
+ * Attribute of an element.
  */
-export type Attributes = Record<string, string>;
+export class Attribute {
+  /**
+   * The name of the attribute.
+   */
+  readonly name: string;
+  /**
+   * The value of the attribute.
+   */
+  readonly value: string;
+
+  /**
+   * Create a new attribute.
+   */
+  constructor(name: string, value: string) {
+    this.name = name;
+    this.value = value;
+  }
+}
 
 /**
  * Parse the attributes of an element from a string.
  *
  * @throws {Error} When a duplicate attribute is found.
  */
-export function parseAttributes(attributesString: string): Attributes {
-  const attributes: Attributes = {};
+export function parseAttributes(attributesString: string): Attribute[] {
+  const attributes: Attribute[] = [];
 
   for (const execArray of attributesString.matchAll(attributeRegex)) {
     const [, , rawName, rawValue1, rawValue2] = execArray;
 
-    if (rawName in attributes) {
+    if (attributes.some(({ name }) => name === rawName)) {
       throw new Error(`Duplicate attribute "${rawName}". This is not valid HTML.`);
     }
 
-    attributes[rawName] = rawValue1 || rawValue2 || defaultAttributeValue;
+    attributes.push(new Attribute(rawName, rawValue1 || rawValue2 || defaultAttributeValue));
   }
 
   return attributes;

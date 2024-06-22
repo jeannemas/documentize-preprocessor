@@ -1,38 +1,56 @@
 import { describe, expect, it } from 'vitest';
 
-import { parseAttributes } from './attributes.js';
+import { generateRandomString, randomInt } from '$lib/test-utils.js';
+
+import { Attribute, parseAttributes } from './attributes.js';
 
 describe(parseAttributes.name, () => {
   it('Should parse the attributes', () => {
     // Arrange
-    const rawAttributes = 'a="foo" b="bar" c="baz" d';
+    const rawAttributesCount = randomInt(5, 11);
+    const rawAttributes = Array.from(
+      { length: rawAttributesCount },
+      () => new Attribute(generateRandomString(), generateRandomString()),
+    );
+    const rawAttributesNames = rawAttributes.map(({ name }) => name);
+    const rawAttributesString = rawAttributes
+      .map(({ name, value }) => `${name}="${value}"`)
+      .join(' ');
 
     // Act
-    const attributes = parseAttributes(rawAttributes);
+    const attributes = parseAttributes(rawAttributesString);
 
     // Assert
-    expect(Object.keys(attributes).length).toEqual(4);
-    expect(attributes.a).toEqual('foo');
-    expect(attributes.b).toEqual('bar');
-    expect(attributes.c).toEqual('baz');
-    expect(attributes.d).toEqual('');
+    expect(attributes).toBeInstanceOf(Array);
+    expect(attributes).toHaveLength(rawAttributesCount);
+
+    for (const attribute of attributes) {
+      expect(attribute).toBeInstanceOf(Attribute);
+      expect(rawAttributesNames).toContain(attribute.name);
+    }
   });
 
   it('Should be able to parse attributes without values', () => {
     // Arrange
-    const rawAttributes = 'a b c';
+    const rawAttributesCount = randomInt(5, 11);
+    const rawAttributes = Array.from(
+      { length: rawAttributesCount },
+      () => new Attribute(generateRandomString(), ''),
+    );
+    const rawAttributesNames = rawAttributes.map(({ name }) => name);
+    const rawAttributesString = rawAttributesNames.join(' ');
 
     // Act
-    const attributes = parseAttributes(rawAttributes);
+    const attributes = parseAttributes(rawAttributesString);
 
     // Assert
-    expect(Object.keys(attributes).length).toEqual(3);
-    expect(attributes).toHaveProperty('a', '');
-    expect(attributes).toHaveProperty('b', '');
-    expect(attributes).toHaveProperty('c', '');
-    expect(attributes.a).toEqual('');
-    expect(attributes.b).toEqual('');
-    expect(attributes.c).toEqual('');
+    expect(attributes).toBeInstanceOf(Array);
+    expect(attributes).toHaveLength(rawAttributesCount);
+
+    for (const attribute of attributes) {
+      expect(attribute).toBeInstanceOf(Attribute);
+      expect(rawAttributesNames).toContain(attribute.name);
+    }
   });
 
   it('Should throw an error', () => {
