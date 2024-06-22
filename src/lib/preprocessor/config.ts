@@ -150,7 +150,7 @@ export function resolveComponentConfig(
 /**
  * Resolve the configuration of the preprocessor.
  */
-export function resolveConfig(config: Config): ResolvedConfig {
+export function resolveConfig(config: Config = {}): ResolvedConfig {
   const resolvedConfig = {
     dataAttributes: {
       description: config.dataAttributes?.description ?? defaultDescriptionDataAttribute,

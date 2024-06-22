@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { resolveConfig } from './config.js';
 import { Meta, extractMeta } from './meta.js';
 
-const resolvedConfig = resolveConfig({});
+const resolvedConfig = resolveConfig();
 const sampleMeta = `
 <meta
   ${resolvedConfig.dataAttributes.global}

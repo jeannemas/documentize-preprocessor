@@ -1,8 +1,8 @@
 import { join } from 'node:path';
-import type { PreprocessorGroup } from 'svelte/compiler';
+import type { MarkupPreprocessor, PreprocessorGroup } from 'svelte/compiler';
 import { Project } from 'ts-morph';
 
-import { resolveComponentConfig, resolveConfig, type Config } from './config.js';
+import { resolveComponentConfig, type ResolvedConfig } from './config.js';
 import { PREPROCESSOR_NAME } from './constants.js';
 import { resolveDescription } from './description.js';
 import { resolveSvelte4Events, resolveSvelte4EventsNode } from './events.js';
@@ -15,169 +15,108 @@ import { resolveSvelte4Slots, resolveSvelte4SlotsNode } from './slots.js';
 
 /**
  * A Svelte preprocessor that generates documentation for Svelte 4 components.
- *
- * @example
- * `src/lib/components/button.svelte`:
- * ```svelte
- * <script lang="ts">
- *  type $$Events = {
- *    click: MouseEvent;
- *  };
- *  type $$Props = {
- *    disabled?: boolean;
- *  };
- *  type $$Slots = {
- *    default: {
- *      foo: string;
- *    };
- *  };
- * </script>
- *
- * <meta
- *  data-documentize
- *  data-symbol-events="$$Events"
- *  data-symbol-props="$$Props"
- *  data-symbol-slots="$$Slots"
- *  data-description="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
- * />
- *
- * <button style="color: orangered;" on:click>
- *  <slot foo="bar" />
- * </button>
- * ```
- *
- * `dist/components/button.svelte`:
- * ```svelte
- * <script lang="ts">
- *  type $$Events = {
- *    click: MouseEvent;
- *  };
- *  type $$Props = {
- *    disabled?: boolean;
- *  };
- *  type $$Slots = {
- *    default: {
- *      foo: string;
- *    };
- *  };
- * </script>
- *
- * <!--
- * (at)component
- *
- * Lorem ipsum dolor sit amet, consectetur adipiscing elit.
- *
- * ### Events
- *
- * The following events are dispatched by this component:
- * | Event   |
- * | :------ |
- * | `click` |
- *
- * ### Props
- *
- * The following props are available for this component:
- * | Prop       | Description |
- * | :--------- | :---------- |
- * | `disabled` |             |
- *
- * ### Slots
- *
- * The following slots are available for this component:
- * | Slot      | Prop  |
- * | :-------- | :---- |
- * | `default` |       |
- * |           | `foo` |
- * -->
- *
- * <button style="color: orangered;" on:click>
- *  <slot foo="bar" />
- * </button>
- * ```
  */
-export default function documentizePreprocessor(config: Config = {}): PreprocessorGroup {
-  const resolvedConfig = resolveConfig(config);
-  const logger = new Logger(console, resolvedConfig.debug);
-  const project = new Project();
+export class Preprocessor implements PreprocessorGroup {
+  /**
+   * The logger for the preprocessor.
+   */
+  #logger: Logger;
+  /**
+   * The project for the preprocessor.
+   */
+  #project: Project;
+  /**
+   * The resolved configuration for the preprocessor.
+   */
+  #resolvedConfig: ResolvedConfig;
 
-  logger.info('Global config', resolvedConfig);
+  readonly name = PREPROCESSOR_NAME;
 
-  return {
-    name: PREPROCESSOR_NAME,
+  /**
+   * Create a new preprocessor.
+   */
+  constructor(logger: Logger, project: Project, resolvedConfig: ResolvedConfig) {
+    this.#logger = logger;
+    this.#project = project;
+    this.#resolvedConfig = resolvedConfig;
+  }
 
-    markup({ content, filename = '' }) {
-      const meta = extractMeta(content, resolvedConfig.dataAttributes.global);
+  /**
+   * Process the markup of a Svelte component.
+   */
+  markup(...params: Parameters<MarkupPreprocessor>) {
+    const [{ content, filename = '' }] = params;
+    const meta = extractMeta(content, this.#resolvedConfig.dataAttributes.global);
 
-      if (!meta) {
-        // The component does not have any metadata, so we can't generate any documentation.
-        return;
-      }
+    if (!meta) {
+      // The component does not have any metadata, so we can't generate any documentation.
+      return;
+    }
 
-      const resolvedComponentConfig = resolveComponentConfig(meta.attributes, resolvedConfig);
+    const resolvedComponentConfig = resolveComponentConfig(meta.attributes, this.#resolvedConfig);
 
-      logger.info(`Patching '${filename}' based on provided config`, resolvedComponentConfig);
+    this.#logger.info(`Patching '${filename}' based on provided config`, resolvedComponentConfig);
 
-      const scriptContextModule = extractScriptContextModule(content);
-      const scriptNotContextModule = extractScriptNotContextModule(content);
-      const sourceFileContent = `${scriptContextModule?.content ?? ''}\n${scriptNotContextModule?.content ?? ''}`;
-      const sourceFile = project.createSourceFile(
-        join(filename, `${Date.now()}.ts`),
-        sourceFileContent,
+    const scriptContextModule = extractScriptContextModule(content);
+    const scriptNotContextModule = extractScriptNotContextModule(content);
+    const sourceFileContent = `${scriptContextModule?.content ?? ''}\n${scriptNotContextModule?.content ?? ''}`;
+    const sourceFile = this.#project.createSourceFile(
+      join(filename, `${Date.now()}.ts`),
+      sourceFileContent,
+    );
+    const description = resolveDescription(meta.attributes, this.#resolvedConfig);
+    const eventsNode = resolveSvelte4EventsNode(resolvedComponentConfig.events, sourceFile);
+    const propsNode = resolveSvelte4PropsNode(resolvedComponentConfig.props, sourceFile);
+    const slotsNode = resolveSvelte4SlotsNode(resolvedComponentConfig.slots, sourceFile);
+    const svelte4Events = eventsNode ? resolveSvelte4Events(eventsNode) : [];
+    const svelte4Props = propsNode ? resolveSvelte4Props(propsNode) : [];
+    const svelte4Slots = slotsNode ? resolveSvelte4Slots(slotsNode) : [];
+
+    if (!eventsNode) {
+      this.#logger.warn(
+        `Failed to resolve events for symbol '${resolvedComponentConfig.events}' inside '${filename}'`,
       );
-      const description = resolveDescription(meta.attributes, resolvedConfig);
-      const eventsNode = resolveSvelte4EventsNode(resolvedComponentConfig.events, sourceFile);
-      const propsNode = resolveSvelte4PropsNode(resolvedComponentConfig.props, sourceFile);
-      const slotsNode = resolveSvelte4SlotsNode(resolvedComponentConfig.slots, sourceFile);
-      const svelte4Events = eventsNode ? resolveSvelte4Events(eventsNode) : [];
-      const svelte4Props = propsNode ? resolveSvelte4Props(propsNode) : [];
-      const svelte4Slots = slotsNode ? resolveSvelte4Slots(slotsNode) : [];
+    }
 
-      if (!eventsNode) {
-        logger.warn(
-          `Failed to resolve events for symbol '${resolvedComponentConfig.events}' inside '${filename}'`,
-        );
-      }
-
-      if (!propsNode) {
-        logger.warn(
-          `Failed to resolve props for symbol '${resolvedComponentConfig.props}' inside '${filename}'`,
-        );
-      }
-
-      if (!slotsNode) {
-        logger.warn(
-          `Failed to resolve slots for symbol '${resolvedComponentConfig.slots}' inside '${filename}'`,
-        );
-      }
-
-      logger.info('Resolved description', description);
-      logger.info(
-        `Resolved Svelte 4 events from symbol '${resolvedComponentConfig.events}'`,
-        svelte4Events,
+    if (!propsNode) {
+      this.#logger.warn(
+        `Failed to resolve props for symbol '${resolvedComponentConfig.props}' inside '${filename}'`,
       );
-      logger.info(
-        `Resolved Svelte 4 props from symbol '${resolvedComponentConfig.props}'`,
-        svelte4Props,
+    }
+
+    if (!slotsNode) {
+      this.#logger.warn(
+        `Failed to resolve slots for symbol '${resolvedComponentConfig.slots}' inside '${filename}'`,
       );
-      logger.info(
-        `Resolved Svelte 4 slots from symbol '${resolvedComponentConfig.slots}'`,
-        svelte4Slots,
-      );
+    }
 
-      const markdown = buildMarkdown(svelte4Events, svelte4Props, svelte4Slots, description);
-      const comment = `<!--\n${markdown}\n-->`;
-      const newCode = content.replace(meta.regex, comment);
-      const patchIsSuccessful = newCode.includes(comment);
+    this.#logger.info('Resolved description', description);
+    this.#logger.info(
+      `Resolved Svelte 4 events from symbol '${resolvedComponentConfig.events}'`,
+      svelte4Events,
+    );
+    this.#logger.info(
+      `Resolved Svelte 4 props from symbol '${resolvedComponentConfig.props}'`,
+      svelte4Props,
+    );
+    this.#logger.info(
+      `Resolved Svelte 4 slots from symbol '${resolvedComponentConfig.slots}'`,
+      svelte4Slots,
+    );
 
-      if (!patchIsSuccessful) {
-        logger.warn(`Failed to patch ${filename}`);
+    const markdown = buildMarkdown(svelte4Events, svelte4Props, svelte4Slots, description);
+    const comment = `<!--\n${markdown}\n-->`;
+    const newCode = content.replace(meta.regex, comment);
+    const patchIsSuccessful = newCode.includes(comment);
 
-        return;
-      }
+    if (!patchIsSuccessful) {
+      this.#logger.warn(`Failed to patch ${filename}`);
 
-      return {
-        code: newCode,
-      };
-    },
-  };
+      return;
+    }
+
+    return {
+      code: newCode,
+    };
+  }
 }

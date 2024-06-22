@@ -9,7 +9,7 @@ import { defaultDescription, resolveDescription } from './description.js';
 describe(resolveDescription.name, () => {
   it('Should resolve using the default description', () => {
     // Arrange
-    const resolvedConfig = resolveConfig({});
+    const resolvedConfig = resolveConfig();
     const attributes = [] satisfies Attribute[];
 
     // Act
@@ -21,7 +21,7 @@ describe(resolveDescription.name, () => {
 
   it('Should resolve using the provided description', () => {
     // Arrange
-    const resolvedConfig = resolveConfig({});
+    const resolvedConfig = resolveConfig();
     const descriptionAttribute = new Attribute(
       resolvedConfig.dataAttributes.description,
       generateRandomString(),

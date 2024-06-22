@@ -23,7 +23,7 @@ describe(resolveComponentConfig.name, () => {
   it('Should resolve using the default config', () => {
     // Arrange
     const attributes = [] satisfies Attribute[];
-    const resolvedConfig = resolveConfig({});
+    const resolvedConfig = resolveConfig();
 
     // Act
     const componentConfig = resolveComponentConfig(attributes, resolvedConfig);
@@ -36,7 +36,7 @@ describe(resolveComponentConfig.name, () => {
 
   it('Should resolve using the provided config', () => {
     // Arrange
-    const resolvedConfig = resolveConfig({});
+    const resolvedConfig = resolveConfig();
     const eventsAttribute = new Attribute(
       resolvedConfig.dataAttributes.events,
       generateRandomString(),
@@ -64,10 +64,9 @@ describe(resolveComponentConfig.name, () => {
 describe(resolveConfig.name, () => {
   it('Should resolve using the default config', () => {
     // Arrange
-    const config = {} satisfies Config;
 
     // Act
-    const resolvedConfig = resolveConfig(config);
+    const resolvedConfig = resolveConfig();
 
     // Assert
     expect(resolvedConfig).toHaveProperty('dataAttributes');
