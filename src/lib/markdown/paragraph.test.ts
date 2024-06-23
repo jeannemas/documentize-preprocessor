@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import * as Markdown from '$lib/markdown/index.js';
-import { randomString } from '$lib/test-utils/index.js';
+import { randomString } from '$lib/utils/index.js';
 
 describe(Markdown.Paragraph.name, () => {
   describe('constructor', () => {

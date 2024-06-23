@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { randomInteger, randomString } from '$lib/test-utils/index.js';
+import { randomInteger, randomString } from '$lib/utils/index.js';
 
 import { generateRandomEvents } from './events.test.js';
 import {

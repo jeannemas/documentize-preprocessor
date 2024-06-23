@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { randomString } from '$lib/test-utils/index.js';
+import { randomString } from '$lib/utils/index.js';
 
 import { Attribute } from './attributes.js';
 import {

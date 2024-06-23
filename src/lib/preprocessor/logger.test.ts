@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { randomBoolean, randomString } from '$lib/test-utils/index.js';
+import { randomBoolean, randomString } from '$lib/utils/index.js';
 
 import { Logger, type LoggerConsole } from './logger.js';
 

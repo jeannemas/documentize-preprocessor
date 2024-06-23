@@ -4,9 +4,7 @@
  *
  * @param fromChar The first char of the alphabeat.
  * @param toChar The last char of the alphabeat.
- * @returns The alphabeat.
- * @throws When the `fromChar` is not a single character.
- * @throws When the `toChar` is not a single character.
+ * @throws When either char are not a single character.
  * @throws When the `fromChar` ASCII code is greater than the `toChar` one.
  */
 export function generateAlphabeat(fromChar: string, toChar: string): string {
