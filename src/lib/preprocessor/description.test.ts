@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { generateRandomString } from '$lib/test-utils.js';
+import { randomString } from '$lib/test-utils/index.js';
 
 import { Attribute } from './attributes.js';
 import { resolveConfig } from './config.js';
@@ -24,7 +24,7 @@ describe(resolveDescription.name, () => {
     const resolvedConfig = resolveConfig();
     const descriptionAttribute = new Attribute(
       resolvedConfig.dataAttributes.description,
-      generateRandomString(),
+      randomString(),
     );
     const attributes = [descriptionAttribute] satisfies Attribute[];
 

@@ -3,17 +3,19 @@ import { ContainerNode, type InlineNode } from '../internal.js';
 /**
  * The alignments of a table column.
  */
-export const alignments = ['left', 'right'] as const;
+export const columnAlignments = ['left', 'right'] as const;
 
 /**
  * The alignment of a table column.
  */
-export type Alignment = (typeof alignments)[number];
+export type ColumnAlignment = (typeof columnAlignments)[number];
 
 /**
  * A table column in a markdown document.
  */
-export class Column<TAlignment extends Alignment = Alignment> extends ContainerNode<InlineNode> {
+export class Column<
+  TAlignment extends ColumnAlignment = ColumnAlignment,
+> extends ContainerNode<InlineNode> {
   /**
    * The alignment of the column.
    */
@@ -25,9 +27,9 @@ export class Column<TAlignment extends Alignment = Alignment> extends ContainerN
   constructor(alignment: TAlignment, ...nodes: InlineNode[]) {
     super(...nodes);
 
-    if (!alignments.includes(alignment)) {
+    if (!columnAlignments.includes(alignment)) {
       throw new TypeError(
-        `The alignment of the column should be one of ${alignments.map((alignment) => `\`"${alignment}"\``).join(', ')}.`,
+        `The alignment of the column should be one of ${columnAlignments.map((alignment) => `\`"${alignment}"\``).join(', ')}.`,
       );
     }
 

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import * as Markdown from '$lib/markdown/index.js';
-import { generateRandomString } from '$lib/test-utils.js';
+import { randomString } from '$lib/test-utils/index.js';
 
 describe(Markdown.Text.name, () => {
   describe('constructor', () => {
@@ -9,7 +9,7 @@ describe(Markdown.Text.name, () => {
       // Arrange
 
       // Act
-      const action = () => new Markdown.Text(generateRandomString());
+      const action = () => new Markdown.Text(randomString());
 
       // Assert
       expect(action).not.toThrowError();
@@ -23,7 +23,7 @@ describe(Markdown.Text.name, () => {
   describe('asString' satisfies keyof Markdown.Text, () => {
     it('Should return a string', () => {
       // Arrange
-      const text = new Markdown.Text(generateRandomString());
+      const text = new Markdown.Text(randomString());
 
       // Act
       const markdown = text.asString();

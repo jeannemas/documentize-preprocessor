@@ -7,7 +7,7 @@ import {
 } from 'ts-morph';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { generateRandomString, randomInt } from '$lib/test-utils.js';
+import { randomInteger, randomString } from '$lib/test-utils/index.js';
 
 import { Svelte4Prop, resolveSvelte4Props, resolveSvelte4PropsNode } from './props.js';
 
@@ -52,7 +52,7 @@ export function generateRandomProps(propsCount: number): Svelte4Prop[] {
   const props: Svelte4Prop[] = [];
 
   for (let i = 0; i < propsCount; i++) {
-    props.push(new Svelte4Prop(generateRandomString()));
+    props.push(new Svelte4Prop(randomString()));
   }
 
   return props;
@@ -64,14 +64,19 @@ let sourceFile: SourceFile;
 
 beforeEach(() => {
   project = new Project();
-  propsSymbol = generateRandomString();
-  sourceFile = project.createSourceFile(`${generateRandomString()}.ts`);
+  propsSymbol = randomString();
+  sourceFile = project.createSourceFile(`${randomString()}.ts`);
 });
 
 describe(resolveSvelte4Props.name, () => {
   it('Should match the interface declaration', () => {
     // Arrange
-    const props = generateRandomProps(randomInt(5, 11));
+    const props = generateRandomProps(
+      randomInteger({
+        max: 10,
+        min: 5,
+      }),
+    );
     const interfaceDeclaration = addPropsAsInterfaceDeclaration(props, propsSymbol, sourceFile);
 
     // Act
@@ -99,7 +104,12 @@ describe(resolveSvelte4Props.name, () => {
 
   it('Should match the type alias declaration', () => {
     // Arrange
-    const props = generateRandomProps(randomInt(5, 11));
+    const props = generateRandomProps(
+      randomInteger({
+        max: 10,
+        min: 5,
+      }),
+    );
     const typeAliasDeclaration = addPropsAsTypeAliasDeclaration(props, propsSymbol, sourceFile);
 
     // Act
@@ -129,7 +139,12 @@ describe(resolveSvelte4Props.name, () => {
 describe(resolveSvelte4PropsNode.name, () => {
   it('Should match the interface declaration', () => {
     // Arrange
-    const props = generateRandomProps(randomInt(5, 11));
+    const props = generateRandomProps(
+      randomInteger({
+        max: 10,
+        min: 5,
+      }),
+    );
 
     addPropsAsInterfaceDeclaration(props, propsSymbol, sourceFile);
 
@@ -143,7 +158,12 @@ describe(resolveSvelte4PropsNode.name, () => {
 
   it('Should match the type alias declaration', () => {
     // Arrange
-    const props = generateRandomProps(randomInt(5, 11));
+    const props = generateRandomProps(
+      randomInteger({
+        max: 10,
+        min: 5,
+      }),
+    );
 
     addPropsAsTypeAliasDeclaration(props, propsSymbol, sourceFile);
 
@@ -167,8 +187,18 @@ describe(resolveSvelte4PropsNode.name, () => {
 
   it('Should throw an error if the symbol is ambiguous', () => {
     // Arrange
-    const interfaceProps = generateRandomProps(randomInt(5, 11));
-    const typeAliasProps = generateRandomProps(randomInt(5, 11));
+    const interfaceProps = generateRandomProps(
+      randomInteger({
+        max: 10,
+        min: 5,
+      }),
+    );
+    const typeAliasProps = generateRandomProps(
+      randomInteger({
+        max: 10,
+        min: 5,
+      }),
+    );
 
     addPropsAsInterfaceDeclaration(interfaceProps, propsSymbol, sourceFile);
     addPropsAsTypeAliasDeclaration(typeAliasProps, propsSymbol, sourceFile);

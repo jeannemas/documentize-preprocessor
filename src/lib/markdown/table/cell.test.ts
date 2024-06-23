@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import * as Markdown from '$lib/markdown/index.js';
-import { generateRandomString } from '$lib/test-utils.js';
+import { randomString } from '$lib/test-utils/index.js';
 
 describe(Markdown.Table.Cell.name, () => {
   describe('constructor', () => {
@@ -24,7 +24,7 @@ describe(Markdown.Table.Cell.name, () => {
     it('Should return the instance', () => {
       // Arrange
       const cell = new Markdown.Table.Cell();
-      const text = new Markdown.Text(generateRandomString());
+      const text = new Markdown.Text(randomString());
 
       // Act
       const maybeCell = cell.add(text);

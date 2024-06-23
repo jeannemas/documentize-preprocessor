@@ -7,7 +7,7 @@ import {
 } from 'ts-morph';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { generateRandomString, randomInt } from '$lib/test-utils.js';
+import { randomInteger, randomString } from '$lib/test-utils/index.js';
 
 import { Svelte4Event, resolveSvelte4Events, resolveSvelte4EventsNode } from './events.js';
 
@@ -52,7 +52,7 @@ export function generateRandomEvents(eventsCount: number): Svelte4Event[] {
   const events: Svelte4Event[] = [];
 
   for (let i = 0; i < eventsCount; i++) {
-    events.push(new Svelte4Event(generateRandomString()));
+    events.push(new Svelte4Event(randomString()));
   }
 
   return events;
@@ -63,15 +63,20 @@ let project: Project;
 let sourceFile: SourceFile;
 
 beforeEach(() => {
-  eventsSymbol = generateRandomString();
+  eventsSymbol = randomString();
   project = new Project();
-  sourceFile = project.createSourceFile(`${generateRandomString()}.ts`);
+  sourceFile = project.createSourceFile(`${randomString()}.ts`);
 });
 
 describe(resolveSvelte4Events.name, () => {
   it('Should match the interface declaration', () => {
     // Arrange
-    const events = generateRandomEvents(randomInt(5, 11));
+    const events = generateRandomEvents(
+      randomInteger({
+        max: 10,
+        min: 5,
+      }),
+    );
     const interfaceDeclaration = addEventsAsInterfaceDeclaration(events, eventsSymbol, sourceFile);
 
     // Act
@@ -99,7 +104,12 @@ describe(resolveSvelte4Events.name, () => {
 
   it('Should match the type alias declaration', () => {
     // Arrange
-    const events = generateRandomEvents(randomInt(5, 11));
+    const events = generateRandomEvents(
+      randomInteger({
+        max: 10,
+        min: 5,
+      }),
+    );
     const typeAliasDeclaration = addEventsAsTypeAliasDeclaration(events, eventsSymbol, sourceFile);
 
     // Act
@@ -129,7 +139,12 @@ describe(resolveSvelte4Events.name, () => {
 describe(resolveSvelte4EventsNode.name, () => {
   it('Should match the interface declaration', () => {
     // Arrange
-    const events = generateRandomEvents(randomInt(5, 11));
+    const events = generateRandomEvents(
+      randomInteger({
+        max: 10,
+        min: 5,
+      }),
+    );
 
     addEventsAsInterfaceDeclaration(events, eventsSymbol, sourceFile);
 
@@ -143,7 +158,12 @@ describe(resolveSvelte4EventsNode.name, () => {
 
   it('Should match the type alias declaration', () => {
     // Arrange
-    const events = generateRandomEvents(randomInt(5, 11));
+    const events = generateRandomEvents(
+      randomInteger({
+        max: 10,
+        min: 5,
+      }),
+    );
 
     addEventsAsTypeAliasDeclaration(events, eventsSymbol, sourceFile);
 
@@ -167,8 +187,18 @@ describe(resolveSvelte4EventsNode.name, () => {
 
   it('Should throw an error if the symbol is ambiguous', () => {
     // Arrange
-    const interfaceEvents = generateRandomEvents(randomInt(5, 11));
-    const typeAliasEvents = generateRandomEvents(randomInt(5, 11));
+    const interfaceEvents = generateRandomEvents(
+      randomInteger({
+        max: 10,
+        min: 5,
+      }),
+    );
+    const typeAliasEvents = generateRandomEvents(
+      randomInteger({
+        max: 10,
+        min: 5,
+      }),
+    );
 
     addEventsAsInterfaceDeclaration(interfaceEvents, eventsSymbol, sourceFile);
     addEventsAsTypeAliasDeclaration(typeAliasEvents, eventsSymbol, sourceFile);

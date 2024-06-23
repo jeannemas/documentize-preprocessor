@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { generateRandomString } from '$lib/test-utils.js';
+import { randomString } from '$lib/test-utils/index.js';
 
 import { Attribute } from './attributes.js';
 import {
@@ -37,18 +37,9 @@ describe(resolveComponentConfig.name, () => {
   it('Should resolve using the provided config', () => {
     // Arrange
     const resolvedConfig = resolveConfig();
-    const eventsAttribute = new Attribute(
-      resolvedConfig.dataAttributes.events,
-      generateRandomString(),
-    );
-    const propsAttribute = new Attribute(
-      resolvedConfig.dataAttributes.props,
-      generateRandomString(),
-    );
-    const slotsAttribute = new Attribute(
-      resolvedConfig.dataAttributes.slots,
-      generateRandomString(),
-    );
+    const eventsAttribute = new Attribute(resolvedConfig.dataAttributes.events, randomString());
+    const propsAttribute = new Attribute(resolvedConfig.dataAttributes.props, randomString());
+    const slotsAttribute = new Attribute(resolvedConfig.dataAttributes.slots, randomString());
     const attributes = [eventsAttribute, propsAttribute, slotsAttribute];
 
     // Act
@@ -89,17 +80,17 @@ describe(resolveConfig.name, () => {
     // Arrange
     const config = {
       dataAttributes: {
-        description: `data-description-${generateRandomString()}`,
-        events: `data-${generateRandomString()}`,
-        global: `data-${generateRandomString()}`,
-        props: `data-${generateRandomString()}`,
-        slots: `data-${generateRandomString()}`,
+        description: `data-description-${randomString()}`,
+        events: `data-${randomString()}`,
+        global: `data-${randomString()}`,
+        props: `data-${randomString()}`,
+        slots: `data-${randomString()}`,
       },
       debug: true,
       symbols: {
-        events: generateRandomString(),
-        props: generateRandomString(),
-        slots: generateRandomString(),
+        events: randomString(),
+        props: randomString(),
+        slots: randomString(),
       },
     } satisfies Config;
 
@@ -127,27 +118,27 @@ describe(resolveConfig.name, () => {
     // Arrange
     const configWithInvalidDescriptionDataAttribute = {
       dataAttributes: {
-        description: `invalid-${generateRandomString()}` as DataAttribute,
+        description: `invalid-${randomString()}` as DataAttribute,
       },
     } satisfies Config;
     const configWithInvalidEventsDataAttribute = {
       dataAttributes: {
-        events: `invalid-${generateRandomString()}` as DataAttribute,
+        events: `invalid-${randomString()}` as DataAttribute,
       },
     } satisfies Config;
     const configWithInvalidGlobalDataAttribute = {
       dataAttributes: {
-        global: `invalid-${generateRandomString()}` as DataAttribute,
+        global: `invalid-${randomString()}` as DataAttribute,
       },
     } satisfies Config;
     const configWithInvalidPropsDataAttribute = {
       dataAttributes: {
-        props: `invalid-${generateRandomString()}` as DataAttribute,
+        props: `invalid-${randomString()}` as DataAttribute,
       },
     } satisfies Config;
     const configWithInvalidSlotsDataAttribute = {
       dataAttributes: {
-        slots: `invalid-${generateRandomString()}` as DataAttribute,
+        slots: `invalid-${randomString()}` as DataAttribute,
       },
     } satisfies Config;
 

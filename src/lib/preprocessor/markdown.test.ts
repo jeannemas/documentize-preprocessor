@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import type { Svelte4Event } from './events.js';
+import { randomInteger, randomString } from '$lib/test-utils/index.js';
+
+import { generateRandomEvents } from './events.test.js';
 import {
   buildMarkdown,
   emptyEventsText,
@@ -11,185 +13,229 @@ import {
   propsText,
   slotsText,
 } from './markdown.js';
-import type { Svelte4Prop } from './props.js';
-import type { Svelte4Slot } from './slots.js';
-
-/**
- * Sample test events.
- */
-const sampleEvents = [
-  { name: 'event_foo' },
-  { name: 'event_bar' },
-  { name: 'event_baz' },
-] satisfies Svelte4Event[];
-/**
- * Sample test props.
- */
-const sampleProps = [
-  { name: 'prop_foo' },
-  { name: 'prop_bar' },
-  { name: 'prop_baz' },
-] satisfies Svelte4Prop[];
-/**
- * Sample test slots.
- */
-const sampleSlots = [
-  {
-    name: 'slot_foo',
-    properties: [
-      { name: 'slot_foo_prop_foo' },
-      { name: 'slot_foo_prop_bar' },
-      { name: 'slot_foo_prop_baz' },
-    ],
-  },
-  {
-    name: 'slot_bar',
-    properties: [
-      { name: 'slot_bar_prop_foo' },
-      { name: 'slot_bar_prop_bar' },
-      { name: 'slot_bar_prop_baz' },
-    ],
-  },
-  {
-    name: 'slot_baz',
-    properties: [
-      { name: 'slot_baz_prop_foo' },
-      { name: 'slot_baz_prop_bar' },
-      { name: 'slot_baz_prop_baz' },
-    ],
-  },
-] satisfies Svelte4Slot[];
-/**
- * Sample test description.
- */
-const sampleDescription = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
+import { Svelte4Metadata } from './preprocessor.js';
+import { generateRandomProps } from './props.test.js';
+import { generateRandomSlots } from './slots.test.js';
 
 describe(buildMarkdown.name, () => {
   it('Should build the documentation as Markdown of a Svelte 4 component', () => {
     // Arrange
-    const events = sampleEvents;
-    const props = sampleProps;
-    const slots = sampleSlots;
-    const description = sampleDescription;
+    const metadata = new Svelte4Metadata(
+      randomString(),
+      randomString(),
+      generateRandomEvents(
+        randomInteger({
+          max: 10,
+          min: 5,
+        }),
+      ),
+      generateRandomProps(
+        randomInteger({
+          max: 10,
+          min: 5,
+        }),
+      ),
+      generateRandomSlots(
+        randomInteger({
+          max: 10,
+          min: 5,
+        }),
+        randomInteger({
+          max: 10,
+          min: 5,
+        }),
+      ),
+    );
 
     // Act
-    const markdown = buildMarkdown(events, props, slots, description);
+    const markdown = buildMarkdown(metadata);
 
     // Assert
     expect(markdown).toBeTypeOf('string');
     expect(markdown).toContain(prefix);
-    expect(markdown).toContain(description);
+    expect(markdown).toContain(metadata.description);
+
+    for (const { name } of metadata.events) {
+      expect(markdown).toContain(name);
+    }
+
+    for (const { name } of metadata.props) {
+      expect(markdown).toContain(name);
+    }
+
+    for (const { name, properties } of metadata.slots) {
+      expect(markdown).toContain(name);
+
+      for (const { name } of properties) {
+        expect(markdown).toContain(name);
+      }
+    }
   });
 
   it('Should build the documentation with no events', () => {
     // Arrange
-    const events = [] satisfies Svelte4Event[];
-    const props = sampleProps;
-    const slots = sampleSlots;
-    const description = sampleDescription;
+    const metadata = new Svelte4Metadata(
+      randomString(),
+      randomString(),
+      [],
+      generateRandomProps(
+        randomInteger({
+          max: 10,
+          min: 5,
+        }),
+      ),
+      generateRandomSlots(
+        randomInteger({
+          max: 10,
+          min: 5,
+        }),
+        randomInteger({
+          max: 10,
+          min: 5,
+        }),
+      ),
+    );
 
     // Act
-    const markdown = buildMarkdown(events, props, slots, description);
+    const markdown = buildMarkdown(metadata);
 
     // Assert
-    expect(markdown.includes(emptyEventsText)).toBe(true);
-    expect(markdown.includes(eventsText)).toBe(false);
-    expect(markdown.includes(emptyPropsText)).toBe(false);
-    expect(markdown.includes(propsText)).toBe(true);
+    expect(markdown).toContain(emptyEventsText);
+    expect(markdown).not.toContain(eventsText);
+    expect(markdown).not.toContain(emptyPropsText);
+    expect(markdown).toContain(propsText);
 
-    for (const prop of props) {
-      expect(markdown.includes(prop.name)).toBe(true);
+    for (const { name } of metadata.props) {
+      expect(markdown).toContain(name);
     }
 
-    expect(markdown.includes(emptySlotsText)).toBe(false);
-    expect(markdown.includes(slotsText)).toBe(true);
+    expect(markdown).not.toContain(emptySlotsText);
+    expect(markdown).toContain(slotsText);
 
-    for (const slot of slots) {
-      expect(markdown.includes(slot.name)).toBe(true);
+    for (const { name, properties } of metadata.slots) {
+      expect(markdown).toContain(name);
 
-      for (const property of slot.properties) {
-        expect(markdown.includes(property.name)).toBe(true);
+      for (const { name } of properties) {
+        expect(markdown).toContain(name);
       }
     }
   });
 
   it('Should build the documentation with no props', () => {
-    // Arrange
-    const events = sampleEvents;
-    const props = [] satisfies Svelte4Prop[];
-    const slots = sampleSlots;
-    const description = sampleDescription;
+    /// Arrange
+    const metadata = new Svelte4Metadata(
+      randomString(),
+      randomString(),
+      generateRandomEvents(
+        randomInteger({
+          max: 10,
+          min: 5,
+        }),
+      ),
+      [],
+      generateRandomSlots(
+        randomInteger({
+          max: 10,
+          min: 5,
+        }),
+        randomInteger({
+          max: 10,
+          min: 5,
+        }),
+      ),
+    );
 
     // Act
-    const markdown = buildMarkdown(events, props, slots, description);
+    const markdown = buildMarkdown(metadata);
 
     // Assert
-    expect(markdown.includes(emptyEventsText)).toBe(false);
-    expect(markdown.includes(eventsText)).toBe(true);
+    expect(markdown).not.toContain(emptyEventsText);
+    expect(markdown).toContain(eventsText);
 
-    for (const event of events) {
-      expect(markdown.includes(event.name)).toBe(true);
+    for (const { name } of metadata.events) {
+      expect(markdown).toContain(name);
     }
 
-    expect(markdown.includes(emptyPropsText)).toBe(true);
-    expect(markdown.includes(propsText)).toBe(false);
-    expect(markdown.includes(emptySlotsText)).toBe(false);
-    expect(markdown.includes(slotsText)).toBe(true);
+    expect(markdown).toContain(emptyPropsText);
+    expect(markdown).not.toContain(propsText);
+    expect(markdown).not.toContain(emptySlotsText);
+    expect(markdown).toContain(slotsText);
 
-    for (const slot of slots) {
-      expect(markdown.includes(slot.name)).toBe(true);
+    for (const { name, properties } of metadata.slots) {
+      expect(markdown).toContain(name);
 
-      for (const property of slot.properties) {
-        expect(markdown.includes(property.name)).toBe(true);
+      for (const { name } of properties) {
+        expect(markdown).toContain(name);
       }
     }
   });
 
   it('Should build the documentation with no slots', () => {
     // Arrange
-    const events = sampleEvents;
-    const props = sampleProps;
-    const slots = [] satisfies Svelte4Slot[];
-    const description = sampleDescription;
+    const metadata = new Svelte4Metadata(
+      randomString(),
+      randomString(),
+      generateRandomEvents(
+        randomInteger({
+          max: 10,
+          min: 5,
+        }),
+      ),
+      generateRandomProps(
+        randomInteger({
+          max: 10,
+          min: 5,
+        }),
+      ),
+      [],
+    );
 
     // Act
-    const markdown = buildMarkdown(events, props, slots, description);
-
-    // Assert
-    expect(markdown.includes(emptyEventsText)).toBe(false);
-    expect(markdown.includes(eventsText)).toBe(true);
-
-    for (const event of events) {
-      expect(markdown.includes(event.name)).toBe(true);
-    }
-
-    expect(markdown.includes(emptyPropsText)).toBe(false);
-    expect(markdown.includes(propsText)).toBe(true);
-
-    for (const prop of props) {
-      expect(markdown.includes(prop.name)).toBe(true);
-    }
-
-    expect(markdown.includes(emptySlotsText)).toBe(true);
-    expect(markdown.includes(slotsText)).toBe(false);
-  });
-
-  it('Should build the documentation with only events', () => {
-    // Arrange
-    const events = sampleEvents;
-    const props = [] satisfies Svelte4Prop[];
-    const slots = [] satisfies Svelte4Slot[];
-    const description = sampleDescription;
-
-    // Act
-    const markdown = buildMarkdown(events, props, slots, description);
+    const markdown = buildMarkdown(metadata);
 
     // Assert
     expect(markdown).not.toContain(emptyEventsText);
     expect(markdown).toContain(eventsText);
 
-    for (const event of events) {
-      expect(markdown).toContain(event.name);
+    for (const { name } of metadata.events) {
+      expect(markdown).toContain(name);
+    }
+
+    expect(markdown).not.toContain(emptyPropsText);
+    expect(markdown).toContain(propsText);
+
+    for (const { name } of metadata.props) {
+      expect(markdown).toContain(name);
+    }
+
+    expect(markdown).toContain(emptySlotsText);
+    expect(markdown).not.toContain(slotsText);
+  });
+
+  it('Should build the documentation with only events', () => {
+    // Arrange
+    const metadata = new Svelte4Metadata(
+      randomString(),
+      randomString(),
+      generateRandomEvents(
+        randomInteger({
+          max: 10,
+          min: 5,
+        }),
+      ),
+      [],
+      [],
+    );
+
+    // Act
+    const markdown = buildMarkdown(metadata);
+
+    // Assert
+    expect(markdown).not.toContain(emptyEventsText);
+    expect(markdown).toContain(eventsText);
+
+    for (const { name } of metadata.events) {
+      expect(markdown).toContain(name);
     }
 
     expect(markdown).toContain(emptyPropsText);
@@ -200,13 +246,21 @@ describe(buildMarkdown.name, () => {
 
   it('Should build the documentation with only props', () => {
     // Arrange
-    const events = [] satisfies Svelte4Event[];
-    const props = sampleProps;
-    const slots = [] satisfies Svelte4Slot[];
-    const description = sampleDescription;
+    const metadata = new Svelte4Metadata(
+      randomString(),
+      randomString(),
+      [],
+      generateRandomProps(
+        randomInteger({
+          max: 10,
+          min: 5,
+        }),
+      ),
+      [],
+    );
 
     // Act
-    const markdown = buildMarkdown(events, props, slots, description);
+    const markdown = buildMarkdown(metadata);
 
     // Assert
     expect(markdown).toContain(emptyEventsText);
@@ -214,8 +268,8 @@ describe(buildMarkdown.name, () => {
     expect(markdown).not.toContain(emptyPropsText);
     expect(markdown).toContain(propsText);
 
-    for (const prop of props) {
-      expect(markdown).toContain(prop.name);
+    for (const { name } of metadata.props) {
+      expect(markdown).toContain(name);
     }
 
     expect(markdown).toContain(emptySlotsText);
@@ -224,13 +278,25 @@ describe(buildMarkdown.name, () => {
 
   it('Should build the documentation with only slots', () => {
     // Arrange
-    const events = [] satisfies Svelte4Event[];
-    const props = [] satisfies Svelte4Prop[];
-    const slots = sampleSlots;
-    const description = sampleDescription;
+    const metadata = new Svelte4Metadata(
+      randomString(),
+      randomString(),
+      [],
+      [],
+      generateRandomSlots(
+        randomInteger({
+          max: 10,
+          min: 5,
+        }),
+        randomInteger({
+          max: 10,
+          min: 5,
+        }),
+      ),
+    );
 
     // Act
-    const markdown = buildMarkdown(events, props, slots, description);
+    const markdown = buildMarkdown(metadata);
 
     // Assert
     expect(markdown).toContain(emptyEventsText);
@@ -240,24 +306,21 @@ describe(buildMarkdown.name, () => {
     expect(markdown).not.toContain(emptySlotsText);
     expect(markdown).toContain(slotsText);
 
-    for (const slot of slots) {
-      expect(markdown).toContain(slot.name);
+    for (const { name, properties } of metadata.slots) {
+      expect(markdown).toContain(name);
 
-      for (const property of slot.properties) {
-        expect(markdown).toContain(property.name);
+      for (const { name } of properties) {
+        expect(markdown).toContain(name);
       }
     }
   });
 
   it('Should build the documentation with no events, props, and slots', () => {
     // Arrange
-    const events = [] satisfies Svelte4Event[];
-    const props = [] satisfies Svelte4Prop[];
-    const slots = [] satisfies Svelte4Slot[];
-    const description = sampleDescription;
+    const metadata = new Svelte4Metadata(randomString(), randomString(), [], [], []);
 
     // Act
-    const markdown = buildMarkdown(events, props, slots, description);
+    const markdown = buildMarkdown(metadata);
 
     // Assert
     expect(markdown).toContain(emptyEventsText);

@@ -1,10 +1,14 @@
 import { describe, expect, it } from 'vitest';
 
 import * as Markdown from '$lib/markdown/index.js';
-import { generateRandomString, randomInt } from '$lib/test-utils.js';
+import { randomInteger, randomString } from '$lib/test-utils/index.js';
 
 export function generateRandomHeadingLevel(): Markdown.HeadingLevel {
-  const index = randomInt(0, Markdown.headingLevels.length);
+  const index = randomInteger({
+    min: 0,
+    max: Markdown.headingLevels.length,
+    upperBoundary: 'exclude',
+  });
   const headingLevel = Markdown.headingLevels[index];
 
   return headingLevel;
@@ -43,7 +47,7 @@ describe(Markdown.Heading.name, () => {
     it('Should return the instance', () => {
       // Arrange
       const heading = new Markdown.Heading(generateRandomHeadingLevel());
-      const text = new Markdown.Text(generateRandomString());
+      const text = new Markdown.Text(randomString());
 
       // Act
       const maybeHeading = heading.add(text);

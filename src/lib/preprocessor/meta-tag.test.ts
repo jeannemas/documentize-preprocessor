@@ -1,32 +1,32 @@
 import { describe, expect, it } from 'vitest';
 
 import { resolveConfig } from './config.js';
-import { Meta, extractMeta } from './meta.js';
+import { MetaTag, extractMetaTag } from './meta-tag.js';
 
 const resolvedConfig = resolveConfig();
-const sampleMeta = `
+const sampleMetaTag = `
 <meta
   ${resolvedConfig.dataAttributes.global}
 />
 `;
 
-describe(extractMeta.name, () => {
-  it('Should extract the meta', () => {
+describe(extractMetaTag.name, () => {
+  it('Should extract the meta tag', () => {
     // Arrange
     const content = `
 Foo bar baz
 
-${sampleMeta}
+${sampleMetaTag}
 
 Lorem ipsum
 `;
 
     // Act
-    const meta = extractMeta(content, resolvedConfig.dataAttributes.global);
+    const metaTag = extractMetaTag(content, resolvedConfig.dataAttributes.global);
 
     // Assert
-    expect(meta).not.toBeNull();
-    expect(meta).toBeInstanceOf(Meta);
+    expect(metaTag).not.toBeNull();
+    expect(metaTag).toBeInstanceOf(MetaTag);
   });
 
   it('Should extract nothing', () => {
@@ -38,26 +38,26 @@ Lorem ipsum
 `;
 
     // Act
-    const script = extractMeta(content, resolvedConfig.dataAttributes.global);
+    const maybeMetaTag = extractMetaTag(content, resolvedConfig.dataAttributes.global);
 
     // Assert
-    expect(script).toBeNull();
+    expect(maybeMetaTag).toBeNull();
   });
 
   it('Should throw an error', () => {
     // Arrange
     const content = `
-${sampleMeta}
+${sampleMetaTag}
 
 Foo bar baz
 
-${sampleMeta}
+${sampleMetaTag}
 
 Lorem ipsum
 `;
 
     // Act
-    const action = () => extractMeta(content, resolvedConfig.dataAttributes.global);
+    const action = () => extractMetaTag(content, resolvedConfig.dataAttributes.global);
 
     // Assert
     expect(action).toThrow(Error);

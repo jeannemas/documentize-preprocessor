@@ -1,6 +1,7 @@
 import * as Markdown from '$lib/markdown/index.js';
 
 import type { Svelte4Event } from './events.js';
+import type { Svelte4Metadata } from './preprocessor.js';
 import type { Svelte4Prop } from './props.js';
 import type { Svelte4Slot } from './slots.js';
 
@@ -48,21 +49,16 @@ export const slotsText = 'The following slots are available for this component.'
 /**
  * Build the documentation as Markdown of a Svelte 4 component.
  */
-export function buildMarkdown(
-  events: Svelte4Event[],
-  props: Svelte4Prop[],
-  slots: Svelte4Slot[],
-  description: string,
-): string {
+export function buildMarkdown(metadata: Svelte4Metadata): string {
   const markdownBuilder = new Markdown.Builder();
 
   markdownBuilder.add(
     new Markdown.Paragraph().add(new Markdown.Text(prefix)),
-    new Markdown.Paragraph().add(new Markdown.Text(description)),
+    new Markdown.Paragraph().add(new Markdown.Text(metadata.description)),
 
-    createEventsSection(events),
-    createPropsSection(props),
-    createSlotsSection(slots),
+    createEventsSection(metadata.events),
+    createPropsSection(metadata.props),
+    createSlotsSection(metadata.slots),
   );
 
   return markdownBuilder.asString();

@@ -1,10 +1,17 @@
 import { describe, expect, it } from 'vitest';
 
 import * as Markdown from '$lib/markdown/index.js';
-import { generateRandomString, randomInt } from '$lib/test-utils.js';
+import { randomInteger, randomString } from '$lib/test-utils/index.js';
 
-export function generateRandomAlignment(): Markdown.Table.ColumnAlignment {
-  const index = randomInt(0, Markdown.Table.columnAlignments.length);
+/**
+ * Generate a random column alignment.
+ */
+export function generateRandomColumnAlignment(): Markdown.Table.ColumnAlignment {
+  const index = randomInteger({
+    min: 0,
+    max: Markdown.Table.columnAlignments.length,
+    upperBoundary: 'exclude',
+  });
   const alignment = Markdown.Table.columnAlignments[index];
 
   return alignment;
@@ -14,7 +21,7 @@ describe(Markdown.Table.Column.name, () => {
   describe('constructor', () => {
     it('Should create a new instance', () => {
       // Arrange
-      const alignment = generateRandomAlignment();
+      const alignment = generateRandomColumnAlignment();
 
       // Act
       const action = () => new Markdown.Table.Column(alignment);
@@ -42,9 +49,9 @@ describe(Markdown.Table.Column.name, () => {
   describe('add' satisfies keyof Markdown.Table.Column, () => {
     it('Should return the instance', () => {
       // Arrange
-      const alignment = generateRandomAlignment();
+      const alignment = generateRandomColumnAlignment();
       const column = new Markdown.Table.Column(alignment);
-      const text = new Markdown.Text(generateRandomString());
+      const text = new Markdown.Text(randomString());
 
       // Act
       const maybeColumn = column.add(text);
@@ -58,7 +65,7 @@ describe(Markdown.Table.Column.name, () => {
   describe('alignment' satisfies keyof Markdown.Table.Column, () => {
     it("Should match the constructor's alignment", () => {
       // Arrange
-      const alignment = generateRandomAlignment();
+      const alignment = generateRandomColumnAlignment();
       const column = new Markdown.Table.Column(alignment);
 
       // Act
@@ -72,7 +79,7 @@ describe(Markdown.Table.Column.name, () => {
   describe('asString' satisfies keyof Markdown.Table.Column, () => {
     it('Should return a string', () => {
       // Arrange
-      const alignment = generateRandomAlignment();
+      const alignment = generateRandomColumnAlignment();
       const column = new Markdown.Table.Column(alignment);
 
       // Act

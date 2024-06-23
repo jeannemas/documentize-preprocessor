@@ -3,7 +3,7 @@ import chalk from 'chalk';
 import { version } from '$lib/../../package.json';
 import { PREPROCESSOR_NAME } from './constants.js';
 
-export type LoggerConsole = Pick<Console, 'error' | 'info' | 'warn'>;
+export type LoggerConsole = Pick<Console, 'info' | 'warn'>;
 
 /**
  * A logger that logs to the console.
@@ -27,13 +27,6 @@ export class Logger<TConsole extends LoggerConsole = LoggerConsole> {
   constructor(console: TConsole, debug: boolean) {
     this.#console = console;
     this.#debug = debug;
-  }
-
-  /**
-   * Log to the console with the `error` level.
-   */
-  error(...args: unknown[]): void {
-    this.#console.error(`[${chalk.bgRed(this.#name)}]`, ...args);
   }
 
   /**

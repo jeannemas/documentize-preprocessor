@@ -1,13 +1,28 @@
 import { describe, expect, it } from 'vitest';
 
-import { generateRandomString, randomInt } from '$lib/test-utils.js';
+import { randomBoolean, randomString } from '$lib/test-utils/index.js';
 
 import { Logger, type LoggerConsole } from './logger.js';
 
-export function generateRandomBoolean(): boolean {
-  const boolean = randomInt(0, 2) === 0;
+export class SilentLogger implements LoggerConsole {
+  #infoLogs: unknown[][] = [];
+  #warnLogs: unknown[][] = [];
 
-  return boolean;
+  get infoLogs(): readonly unknown[][] {
+    return this.#infoLogs;
+  }
+
+  get warnLogs(): readonly unknown[][] {
+    return this.#warnLogs;
+  }
+
+  info(...args: Parameters<LoggerConsole['info']>) {
+    this.#infoLogs.push(args);
+  }
+
+  warn(...args: Parameters<LoggerConsole['warn']>) {
+    this.#warnLogs.push(args);
+  }
 }
 
 describe(Logger.name, () => {
@@ -15,7 +30,7 @@ describe(Logger.name, () => {
     it('Should create a new instance', () => {
       // Arrange
       const loggerConsole = console satisfies LoggerConsole;
-      const debug = generateRandomBoolean();
+      const debug = randomBoolean();
 
       // Act
       const action = () => new Logger(loggerConsole, debug);
@@ -29,55 +44,10 @@ describe(Logger.name, () => {
     });
   });
 
-  describe('error' satisfies keyof Logger, () => {
-    it('Should always log to the console', () => {
-      // Arrange
-      const errors: unknown[][] = [];
-      const loggerConsole = {
-        error(...args) {
-          errors.push(args);
-        },
-
-        info: console.info,
-
-        warn: console.warn,
-      } satisfies LoggerConsole;
-      const debugs = [false, true] satisfies boolean[];
-      const actions = new Set<() => void>();
-
-      // Act
-      for (const debug of debugs) {
-        const logger = new Logger(loggerConsole, debug);
-
-        actions.add(() => logger.error(generateRandomString()));
-      }
-
-      // Assert
-      for (const action of actions.values()) {
-        const errorsCountBefore = errors.length;
-
-        expect(action).not.toThrowError();
-
-        const errorsCountAfter = errors.length;
-
-        expect(errorsCountAfter).toBeGreaterThan(errorsCountBefore);
-      }
-    });
-  });
-
   describe('info' satisfies keyof Logger, () => {
     it('Should only log when debug=true', () => {
       // Arrange
-      const infos: unknown[][] = [];
-      const loggerConsole = {
-        error: console.error,
-
-        info(...args) {
-          infos.push(args);
-        },
-
-        warn: console.warn,
-      } satisfies LoggerConsole;
+      const loggerConsole = new SilentLogger();
       const debugs = [false, true] satisfies boolean[];
       const actions = new Map<boolean, () => void>();
 
@@ -85,16 +55,16 @@ describe(Logger.name, () => {
       for (const debug of debugs) {
         const logger = new Logger(loggerConsole, debug);
 
-        actions.set(debug, () => logger.info(generateRandomString()));
+        actions.set(debug, () => logger.info(randomString()));
       }
 
       // Assert
       for (const [debug, action] of actions.entries()) {
-        const infosCountBefore = infos.length;
+        const infosCountBefore = loggerConsole.infoLogs.length;
 
         expect(action).not.toThrowError();
 
-        const infosCountAfter = infos.length;
+        const infosCountAfter = loggerConsole.infoLogs.length;
 
         if (debug) {
           expect(infosCountAfter).toBeGreaterThan(infosCountBefore);
@@ -108,16 +78,7 @@ describe(Logger.name, () => {
   describe('warn' satisfies keyof Logger, () => {
     it('Should only log when debug=true', () => {
       // Arrange
-      const warns: unknown[][] = [];
-      const loggerConsole = {
-        error: console.error,
-
-        info: console.info,
-
-        warn(...args) {
-          warns.push(args);
-        },
-      } satisfies LoggerConsole;
+      const loggerConsole = new SilentLogger();
       const debugs = [false, true] satisfies boolean[];
       const actions = new Map<boolean, () => void>();
 
@@ -125,16 +86,16 @@ describe(Logger.name, () => {
       for (const debug of debugs) {
         const logger = new Logger(loggerConsole, debug);
 
-        actions.set(debug, () => logger.warn(generateRandomString()));
+        actions.set(debug, () => logger.warn(randomString()));
       }
 
       // Assert
       for (const [debug, action] of actions.entries()) {
-        const warnsCountBefore = warns.length;
+        const warnsCountBefore = loggerConsole.warnLogs.length;
 
         expect(action).not.toThrowError();
 
-        const warnsCountAfter = warns.length;
+        const warnsCountAfter = loggerConsole.warnLogs.length;
 
         if (debug) {
           expect(warnsCountAfter).toBeGreaterThan(warnsCountBefore);

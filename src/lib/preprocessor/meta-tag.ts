@@ -4,7 +4,7 @@ import type { DataAttribute } from './config.js';
 /**
  * The meta tag of a component.
  */
-export class Meta {
+export class MetaTag {
   /**
    * The attributes of the meta tag.
    */
@@ -29,19 +29,22 @@ export class Meta {
  *
  * @throws {Error} When multiple meta tags are found.
  */
-export function extractMeta(content: string, globalDataAttribute: DataAttribute): Meta | null {
+export function extractMetaTag(
+  content: string,
+  globalDataAttribute: DataAttribute,
+): MetaTag | null {
   const metaRegex = new RegExp(`(<meta\\s+(${globalDataAttribute}[^>]*?)>)`, 'g');
-  const metas: Meta[] = [];
+  const metaTags: MetaTag[] = [];
 
   for (const execArray of content.matchAll(metaRegex)) {
     const [, , rawAttributes] = execArray;
 
-    metas.push(new Meta(parseAttributes(rawAttributes), metaRegex));
+    metaTags.push(new MetaTag(parseAttributes(rawAttributes), metaRegex));
   }
 
-  if (metas.length > 1) {
+  if (metaTags.length > 1) {
     throw new Error('Multiple meta tags found.');
   }
 
-  return metas.at(0) ?? null;
+  return metaTags.at(0) ?? null;
 }

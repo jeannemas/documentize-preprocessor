@@ -7,7 +7,7 @@ import {
 } from 'ts-morph';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { generateRandomString, randomInt } from '$lib/test-utils.js';
+import { randomInteger, randomString } from '$lib/test-utils/index.js';
 
 import {
   Svelte4Slot,
@@ -66,7 +66,7 @@ export function generateRandomSlotProperty(propertyCount: number): Svelte4SlotPr
   const properties: Svelte4SlotProperty[] = [];
 
   for (let i = 0; i < propertyCount; i++) {
-    properties.push(new Svelte4SlotProperty(generateRandomString()));
+    properties.push(new Svelte4SlotProperty(randomString()));
   }
 
   return properties;
@@ -76,7 +76,7 @@ export function generateRandomSlots(slotsCount: number, propertyCount: number): 
   const slots: Svelte4Slot[] = [];
 
   for (let i = 0; i < slotsCount; i++) {
-    slots.push(new Svelte4Slot(generateRandomString(), generateRandomSlotProperty(propertyCount)));
+    slots.push(new Svelte4Slot(randomString(), generateRandomSlotProperty(propertyCount)));
   }
 
   return slots;
@@ -88,14 +88,23 @@ let sourceFile: SourceFile;
 
 beforeEach(() => {
   project = new Project();
-  slotsSymbol = generateRandomString();
-  sourceFile = project.createSourceFile(`${generateRandomString()}.ts`);
+  slotsSymbol = randomString();
+  sourceFile = project.createSourceFile(`${randomString()}.ts`);
 });
 
 describe(resolveSvelte4Slots.name, () => {
   it('Should match the interface declaration', () => {
     // Arrange
-    const slots = generateRandomSlots(randomInt(5, 11), randomInt(5, 11));
+    const slots = generateRandomSlots(
+      randomInteger({
+        max: 10,
+        min: 5,
+      }),
+      randomInteger({
+        max: 10,
+        min: 5,
+      }),
+    );
     const interfaceDeclaration = addSlotsAsInterfaceDeclaration(slots, slotsSymbol, sourceFile);
 
     // Act
@@ -123,7 +132,16 @@ describe(resolveSvelte4Slots.name, () => {
 
   it('Should match the type alias declaration', () => {
     // Arrange
-    const slots = generateRandomSlots(randomInt(5, 11), randomInt(5, 11));
+    const slots = generateRandomSlots(
+      randomInteger({
+        max: 10,
+        min: 5,
+      }),
+      randomInteger({
+        max: 10,
+        min: 5,
+      }),
+    );
     const typeAliasDeclaration = addPropsAsTypeAliasDeclaration(slots, slotsSymbol, sourceFile);
 
     // Act
@@ -153,7 +171,16 @@ describe(resolveSvelte4Slots.name, () => {
 describe(resolveSvelte4SlotsNode.name, () => {
   it('Should match the interface declaration', () => {
     // Arrange
-    const slots = generateRandomSlots(randomInt(5, 11), randomInt(5, 11));
+    const slots = generateRandomSlots(
+      randomInteger({
+        max: 10,
+        min: 5,
+      }),
+      randomInteger({
+        max: 10,
+        min: 5,
+      }),
+    );
 
     addSlotsAsInterfaceDeclaration(slots, slotsSymbol, sourceFile);
 
@@ -167,7 +194,16 @@ describe(resolveSvelte4SlotsNode.name, () => {
 
   it('Should match the type alias declaration', () => {
     // Arrange
-    const slots = generateRandomSlots(randomInt(5, 11), randomInt(5, 11));
+    const slots = generateRandomSlots(
+      randomInteger({
+        max: 10,
+        min: 5,
+      }),
+      randomInteger({
+        max: 10,
+        min: 5,
+      }),
+    );
 
     addPropsAsTypeAliasDeclaration(slots, slotsSymbol, sourceFile);
 
@@ -191,8 +227,26 @@ describe(resolveSvelte4SlotsNode.name, () => {
 
   it('Should throw an error if the symbol is ambiguous', () => {
     // Arrange
-    const interfaceProps = generateRandomSlots(randomInt(5, 11), randomInt(5, 11));
-    const typeAliasProps = generateRandomSlots(randomInt(5, 11), randomInt(5, 11));
+    const interfaceProps = generateRandomSlots(
+      randomInteger({
+        max: 10,
+        min: 5,
+      }),
+      randomInteger({
+        max: 10,
+        min: 5,
+      }),
+    );
+    const typeAliasProps = generateRandomSlots(
+      randomInteger({
+        max: 10,
+        min: 5,
+      }),
+      randomInteger({
+        max: 10,
+        min: 5,
+      }),
+    );
 
     addSlotsAsInterfaceDeclaration(interfaceProps, slotsSymbol, sourceFile);
     addPropsAsTypeAliasDeclaration(typeAliasProps, slotsSymbol, sourceFile);

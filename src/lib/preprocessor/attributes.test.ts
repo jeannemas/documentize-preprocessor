@@ -1,61 +1,93 @@
 import { describe, expect, it } from 'vitest';
 
-import { generateRandomString, randomInt } from '$lib/test-utils.js';
+import { randomInteger, randomString } from '$lib/test-utils/index.js';
 
 import { Attribute, parseAttributes } from './attributes.js';
+
+/**
+ * Compile the attributes into a string.
+ *
+ * This is roughly the opposite of `parseAttributes`.
+ */
+export function compileAttributesIntoString(attributes: Attribute[]): string {
+  const strings: string[] = [];
+
+  for (const attribute of attributes) {
+    if (attribute.value) {
+      // If the value is not empty, add the attribute with the value.
+      const value = JSON.stringify(attribute.value); // The value is stringified to handle quotes escaping.
+
+      strings.push(`${attribute.name}=${value}`);
+    } else {
+      // If the value is empty, add the attribute without the value.
+      strings.push(attribute.name);
+    }
+  }
+
+  return strings.join(' ');
+}
 
 describe(parseAttributes.name, () => {
   it('Should parse the attributes', () => {
     // Arrange
-    const rawAttributesCount = randomInt(5, 11);
-    const rawAttributes = Array.from(
-      { length: rawAttributesCount },
-      () => new Attribute(generateRandomString(), generateRandomString()),
+    const attributesCount = randomInteger({
+      max: 10,
+      min: 5,
+    });
+    const attributes = Array.from(
+      { length: attributesCount },
+      () =>
+        new Attribute(
+          randomString(), // Random name
+          randomString(), // Random value
+        ),
     );
-    const rawAttributesNames = rawAttributes.map(({ name }) => name);
-    const rawAttributesString = rawAttributes
-      .map(({ name, value }) => `${name}="${value}"`)
-      .join(' ');
+    const attributesNames = attributes.map(({ name }) => name);
+    const attributesString = compileAttributesIntoString(attributes);
 
     // Act
-    const attributes = parseAttributes(rawAttributesString);
+    const parsedAttributes = parseAttributes(attributesString);
 
     // Assert
-    expect(attributes).toBeInstanceOf(Array);
-    expect(attributes).toHaveLength(rawAttributesCount);
+    expect(parsedAttributes).toBeInstanceOf(Array);
+    expect(parsedAttributes).toHaveLength(attributesCount);
 
-    for (const attribute of attributes) {
+    for (const attribute of parsedAttributes) {
       expect(attribute).toBeInstanceOf(Attribute);
-      expect(rawAttributesNames).toContain(attribute.name);
+      expect(attributesNames).toContain(attribute.name);
     }
   });
 
   it('Should be able to parse attributes without values', () => {
     // Arrange
-    const rawAttributesCount = randomInt(5, 11);
-    const rawAttributes = Array.from(
-      { length: rawAttributesCount },
-      () => new Attribute(generateRandomString(), ''),
+    const attributesCount = randomInteger({
+      max: 10,
+      min: 5,
+    });
+    const attributes = Array.from(
+      { length: attributesCount },
+      () => new Attribute(randomString(), ''),
     );
-    const rawAttributesNames = rawAttributes.map(({ name }) => name);
-    const rawAttributesString = rawAttributesNames.join(' ');
+    const attributesNames = attributes.map(({ name }) => name);
+    const attributesString = compileAttributesIntoString(attributes);
 
     // Act
-    const attributes = parseAttributes(rawAttributesString);
+    const parsedAttributes = parseAttributes(attributesString);
 
     // Assert
-    expect(attributes).toBeInstanceOf(Array);
-    expect(attributes).toHaveLength(rawAttributesCount);
+    expect(parsedAttributes).toBeInstanceOf(Array);
+    expect(parsedAttributes).toHaveLength(attributesCount);
 
-    for (const attribute of attributes) {
+    for (const attribute of parsedAttributes) {
       expect(attribute).toBeInstanceOf(Attribute);
-      expect(rawAttributesNames).toContain(attribute.name);
+      expect(attributesNames).toContain(attribute.name);
     }
   });
 
   it('Should throw an error', () => {
     // Arrange
-    const rawAttributes = 'a="foo" a="bar"';
+    const attributes = [new Attribute('a', 'foo'), new Attribute('a', 'bar')] satisfies Attribute[];
+    const rawAttributes = compileAttributesIntoString(attributes);
 
     // Act
     const action = () => parseAttributes(rawAttributes);

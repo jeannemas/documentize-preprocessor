@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { Attribute } from './attributes.js';
+import { compileAttributesIntoString } from './attributes.test.js';
 import {
   Svelte4Script,
   extractScriptContextModule,
@@ -8,20 +9,41 @@ import {
   extractScripts,
 } from './scripts.js';
 
-const sampleScriptContextModule = `
-<script context="module" lang="ts">
+/**
+ * Generate a script tag.
+ */
+export function generateScript(attributes: Attribute[], content: string): string {
+  return `
+<script ${compileAttributesIntoString(attributes)}>
+${content}
+</script>
+`;
+}
+
+/**
+ * Generate a script tag with the `context="module"` attribute.
+ */
+export function generateScriptContextModule(content: string): string {
+  return generateScript([new Attribute('context', 'module'), new Attribute('lang', 'ts')], content);
+}
+
+/**
+ * Generate a script tag without the `context="module"` attribute.
+ */
+export function generateScriptNotContextModule(content: string): string {
+  return generateScript([new Attribute('lang', 'ts')], content);
+}
+
+const sampleScriptContextModule = generateScriptContextModule(`
+  const foo = 'bar';
+	const bar = 1 << 2;
+	const baz = 3 / 2;
+`);
+const sampleScriptNotContextModule = generateScriptNotContextModule(`
 	const foo = 'bar';
 	const bar = 1 << 2;
 	const baz = 3 / 2;
-</script>
-`;
-const sampleScriptNotContextModule = `
-<script lang="ts">
-	const foo = 'bar';
-	const bar = 1 << 2;
-	const baz = 3 / 2;
-</script>
-`;
+`);
 const sampleValidComponentWithScripts = `
 ${sampleScriptContextModule}
 
