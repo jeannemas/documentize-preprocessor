@@ -1,5 +1,4 @@
 import {
-  Node,
   Project,
   type InterfaceDeclaration,
   type SourceFile,
@@ -9,12 +8,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import { randomInteger, randomString } from '$lib/utils/index.js';
 
-import {
-  Svelte4Slot,
-  Svelte4SlotProperty,
-  resolveSvelte4Slots,
-  resolveSvelte4SlotsNode,
-} from './slots.js';
+import { Svelte4Slot, Svelte4SlotProperty, resolveSvelte4Slots } from './slots.js';
 
 export function addSlotsAsInterfaceDeclaration(
   slots: Svelte4Slot[],
@@ -65,7 +59,7 @@ export function addPropsAsTypeAliasDeclaration(
 export function generateRandomSlotProperty(propertyCount: number): Svelte4SlotProperty[] {
   const properties: Svelte4SlotProperty[] = [];
 
-  for (let i = 0; i < propertyCount; i++) {
+  for (let i = 0; i < propertyCount; i += 1) {
     properties.push(new Svelte4SlotProperty(randomString()));
   }
 
@@ -75,7 +69,7 @@ export function generateRandomSlotProperty(propertyCount: number): Svelte4SlotPr
 export function generateRandomSlots(slotsCount: number, propertyCount: number): Svelte4Slot[] {
   const slots: Svelte4Slot[] = [];
 
-  for (let i = 0; i < slotsCount; i++) {
+  for (let i = 0; i < slotsCount; i += 1) {
     slots.push(new Svelte4Slot(randomString(), generateRandomSlotProperty(propertyCount)));
   }
 
@@ -165,96 +159,5 @@ describe(resolveSvelte4Slots.name, () => {
 
       expect(matchingSlot).not.toBeNull();
     }
-  });
-});
-
-describe(resolveSvelte4SlotsNode.name, () => {
-  it('Should match the interface declaration', () => {
-    // Arrange
-    const slots = generateRandomSlots(
-      randomInteger({
-        max: 10,
-        min: 5,
-      }),
-      randomInteger({
-        max: 10,
-        min: 5,
-      }),
-    );
-
-    addSlotsAsInterfaceDeclaration(slots, slotsSymbol, sourceFile);
-
-    // Act
-    const maybeNode = resolveSvelte4SlotsNode(slotsSymbol, sourceFile);
-
-    // Assert
-    expect(maybeNode).not.toBeNull();
-    expect(maybeNode).toBeInstanceOf(Node);
-  });
-
-  it('Should match the type alias declaration', () => {
-    // Arrange
-    const slots = generateRandomSlots(
-      randomInteger({
-        max: 10,
-        min: 5,
-      }),
-      randomInteger({
-        max: 10,
-        min: 5,
-      }),
-    );
-
-    addPropsAsTypeAliasDeclaration(slots, slotsSymbol, sourceFile);
-
-    // Act
-    const maybeNode = resolveSvelte4SlotsNode(slotsSymbol, sourceFile);
-
-    // Assert
-    expect(maybeNode).not.toBeNull();
-    expect(maybeNode).toBeInstanceOf(Node);
-  });
-
-  it('Should match nothing', () => {
-    // Arrange
-
-    // Act
-    const maybeNode = resolveSvelte4SlotsNode(slotsSymbol, sourceFile);
-
-    // Assert
-    expect(maybeNode).toBeNull();
-  });
-
-  it('Should throw an error if the symbol is ambiguous', () => {
-    // Arrange
-    const interfaceProps = generateRandomSlots(
-      randomInteger({
-        max: 10,
-        min: 5,
-      }),
-      randomInteger({
-        max: 10,
-        min: 5,
-      }),
-    );
-    const typeAliasProps = generateRandomSlots(
-      randomInteger({
-        max: 10,
-        min: 5,
-      }),
-      randomInteger({
-        max: 10,
-        min: 5,
-      }),
-    );
-
-    addSlotsAsInterfaceDeclaration(interfaceProps, slotsSymbol, sourceFile);
-    addPropsAsTypeAliasDeclaration(typeAliasProps, slotsSymbol, sourceFile);
-
-    // Act
-    const action = () => resolveSvelte4SlotsNode(slotsSymbol, sourceFile);
-
-    // Assert
-    expect(action).toThrowError(Error);
   });
 });

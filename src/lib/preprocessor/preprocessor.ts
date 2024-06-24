@@ -10,13 +10,14 @@ import {
 } from './config.js';
 import { PREPROCESSOR_NAME } from './constants.js';
 import { resolveDescription } from './description.js';
-import { Svelte4Event, resolveSvelte4Events, resolveSvelte4EventsNode } from './events.js';
+import { Svelte4Event, resolveSvelte4Events } from './events.js';
 import { Logger } from './logger.js';
 import { buildMarkdown } from './markdown.js';
 import { MetaTag, extractMetaTag } from './meta-tag.js';
-import { Svelte4Prop, resolveSvelte4Props, resolveSvelte4PropsNode } from './props.js';
+import { Svelte4Prop, resolveSvelte4Props } from './props.js';
 import { extractScriptContextModule, extractScriptNotContextModule } from './scripts.js';
-import { Svelte4Slot, resolveSvelte4Slots, resolveSvelte4SlotsNode } from './slots.js';
+import { Svelte4Slot, resolveSvelte4Slots } from './slots.js';
+import { getInterfaceOrTypeAliasFromSymbolName } from './symbols.js';
 
 /**
  * The metadata of a Svelte 4 component.
@@ -184,9 +185,18 @@ ${extractScriptNotContextModule(content)?.content ?? ''}
 
     this.#logger.info(`Patching '${filename}' based on provided config`, resolvedComponentConfig);
 
-    const eventsNode = resolveSvelte4EventsNode(resolvedComponentConfig.events, sourceFile);
-    const propsNode = resolveSvelte4PropsNode(resolvedComponentConfig.props, sourceFile);
-    const slotsNode = resolveSvelte4SlotsNode(resolvedComponentConfig.slots, sourceFile);
+    const eventsNode = getInterfaceOrTypeAliasFromSymbolName(
+      resolvedComponentConfig.events,
+      sourceFile,
+    );
+    const propsNode = getInterfaceOrTypeAliasFromSymbolName(
+      resolvedComponentConfig.props,
+      sourceFile,
+    );
+    const slotsNode = getInterfaceOrTypeAliasFromSymbolName(
+      resolvedComponentConfig.slots,
+      sourceFile,
+    );
     const description = resolveDescription(metaTag.attributes, this.#resolvedConfig);
     const events = eventsNode ? resolveSvelte4Events(eventsNode) : [];
     const props = propsNode ? resolveSvelte4Props(propsNode) : [];

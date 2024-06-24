@@ -1,15 +1,19 @@
 import {
-  Node,
+  InterfaceDeclaration,
   Project,
-  type InterfaceDeclaration,
+  TypeAliasDeclaration,
+  type OptionalKind,
+  type PropertySignatureStructure,
   type SourceFile,
-  type TypeAliasDeclaration,
+  type WriterFunction,
 } from 'ts-morph';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { randomInteger, randomString } from '$lib/utils/index.js';
 
-import { Svelte4Event, resolveSvelte4Events, resolveSvelte4EventsNode } from './events.js';
+import { Svelte4Event, resolveSvelte4Events } from './events.js';
+
+const simpleTypes = ['string', 'number', 'boolean'] as const;
 
 export function addEventsAsInterfaceDeclaration(
   events: Svelte4Event[],
@@ -51,11 +55,81 @@ export function addEventsAsTypeAliasDeclaration(
 export function generateRandomEvents(eventsCount: number): Svelte4Event[] {
   const events: Svelte4Event[] = [];
 
-  for (let i = 0; i < eventsCount; i++) {
+  for (let i = 0; i < eventsCount; i += 1) {
     events.push(new Svelte4Event(randomString()));
   }
 
   return events;
+}
+
+export function generateSimpleInterfaceProperties(
+  propertyCount: number,
+): OptionalKind<PropertySignatureStructure>[] {
+  const properties: OptionalKind<PropertySignatureStructure>[] = [];
+
+  for (let propertyIndex = 0; propertyIndex < propertyCount; propertyIndex += 1) {
+    const name = randomString({
+      length: randomInteger({
+        max: 5,
+        min: 1,
+      }),
+    });
+    const typeIndex = randomInteger({
+      max: simpleTypes.length,
+      min: 0,
+      upperBoundary: 'exclude',
+    });
+    const type = simpleTypes[typeIndex];
+
+    const property = {
+      name,
+      type,
+    } satisfies OptionalKind<PropertySignatureStructure>;
+
+    properties.push(property);
+  }
+
+  return properties;
+}
+
+export function generateSimpleTypeAlias(propertyCount: number): {
+  properties: OptionalKind<PropertySignatureStructure>[];
+  writerFunction: WriterFunction;
+} {
+  const properties: OptionalKind<PropertySignatureStructure>[] = [];
+
+  for (let propertyIndex = 0; propertyIndex < propertyCount; propertyIndex += 1) {
+    const name = randomString({
+      length: randomInteger({
+        max: 5,
+        min: 1,
+      }),
+    });
+    const typeIndex = randomInteger({
+      max: simpleTypes.length,
+      min: 0,
+      upperBoundary: 'exclude',
+    });
+    const type = simpleTypes[typeIndex];
+
+    const property = {
+      name,
+      type,
+    } satisfies OptionalKind<PropertySignatureStructure>;
+
+    properties.push(property);
+  }
+
+  return {
+    properties,
+    writerFunction(writer) {
+      writer.block(() => {
+        for (const property of properties) {
+          writer.writeLine(`${property.name}: ${property.type};`);
+        }
+      });
+    },
+  };
 }
 
 let eventsSymbol: string;
@@ -134,79 +208,76 @@ describe(resolveSvelte4Events.name, () => {
       expect(matchingEvent).not.toBeNull();
     }
   });
-});
 
-describe(resolveSvelte4EventsNode.name, () => {
-  it('Should match the interface declaration', () => {
+  it('Should resolve simple interface', () => {
     // Arrange
-    const events = generateRandomEvents(
-      randomInteger({
-        max: 10,
-        min: 5,
-      }),
-    );
-
-    addEventsAsInterfaceDeclaration(events, eventsSymbol, sourceFile);
+    const propertyCount = randomInteger({
+      max: 10,
+      min: 5,
+    });
+    const properties = generateSimpleInterfaceProperties(propertyCount);
+    const interfaceDeclaration = sourceFile.addInterface({
+      name: eventsSymbol,
+      properties,
+    });
 
     // Act
-    const maybeNode = resolveSvelte4EventsNode(eventsSymbol, sourceFile);
+    const maybeEvents = resolveSvelte4Events(interfaceDeclaration);
 
     // Assert
-    expect(maybeNode).not.toBeNull();
-    expect(maybeNode).toBeInstanceOf(Node);
+    expect(maybeEvents).toBeInstanceOf(Array);
+    expect(maybeEvents).toHaveLength(propertyCount);
+
+    for (const property of properties) {
+      const matchingMaybeEvent =
+        maybeEvents.find((maybeEvent) => maybeEvent.name === property.name) ?? null;
+
+      expect(matchingMaybeEvent).not.toBeNull();
+    }
+
+    for (const maybeEvent of maybeEvents) {
+      expect(maybeEvent).toBeInstanceOf(Svelte4Event);
+
+      const matchingProperty =
+        properties.find((property) => property.name === maybeEvent.name) ?? null;
+
+      expect(matchingProperty).not.toBeNull();
+    }
   });
 
-  it('Should match the type alias declaration', () => {
+  it('Should resolve simple type alias', () => {
     // Arrange
-    const events = generateRandomEvents(
-      randomInteger({
-        max: 10,
-        min: 5,
-      }),
-    );
-
-    addEventsAsTypeAliasDeclaration(events, eventsSymbol, sourceFile);
+    const propertyCount = randomInteger({
+      max: 10,
+      min: 5,
+    });
+    const { properties, writerFunction } = generateSimpleTypeAlias(propertyCount);
+    const typeAliasDeclaration = sourceFile.addTypeAlias({
+      name: eventsSymbol,
+      type: writerFunction,
+    });
 
     // Act
-    const maybeNode = resolveSvelte4EventsNode(eventsSymbol, sourceFile);
+    const maybeEvents = resolveSvelte4Events(typeAliasDeclaration);
 
     // Assert
-    expect(maybeNode).not.toBeNull();
-    expect(maybeNode).toBeInstanceOf(Node);
-  });
+    expect(maybeEvents).toBeInstanceOf(Array);
+    expect(maybeEvents).toHaveLength(propertyCount);
 
-  it('Should match nothing', () => {
-    // Arrange
+    for (const property of properties) {
+      const matchingMaybeEvent =
+        maybeEvents.find((maybeEvent) => maybeEvent.name === property.name) ?? null;
 
-    // Act
-    const maybeNode = resolveSvelte4EventsNode(eventsSymbol, sourceFile);
+      expect(matchingMaybeEvent).not.toBeNull();
+    }
 
-    // Assert
-    expect(maybeNode).toBeNull();
-  });
+    for (const maybeEvent of maybeEvents) {
+      expect(maybeEvent).toBeInstanceOf(Svelte4Event);
 
-  it('Should throw an error if the symbol is ambiguous', () => {
-    // Arrange
-    const interfaceEvents = generateRandomEvents(
-      randomInteger({
-        max: 10,
-        min: 5,
-      }),
-    );
-    const typeAliasEvents = generateRandomEvents(
-      randomInteger({
-        max: 10,
-        min: 5,
-      }),
-    );
+      const matchingProperty =
+        properties.find((property) => property.name === maybeEvent.name) ?? null;
 
-    addEventsAsInterfaceDeclaration(interfaceEvents, eventsSymbol, sourceFile);
-    addEventsAsTypeAliasDeclaration(typeAliasEvents, eventsSymbol, sourceFile);
-
-    // Act
-    const action = () => resolveSvelte4EventsNode(eventsSymbol, sourceFile);
-
-    // Assert
-    expect(action).toThrowError(Error);
+      expect(matchingProperty).not.toBeNull();
+    }
   });
 });

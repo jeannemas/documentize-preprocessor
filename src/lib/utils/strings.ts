@@ -3,7 +3,7 @@ import { generateAlphabeat, randomInteger } from './index.js';
 /**
  * The options for generating a random string.
  */
-type Options = {
+export type RandomStringOptions = {
   /**
    * The alphabeat to use.
    *
@@ -28,7 +28,7 @@ type Options = {
 export function randomString({
   alphabeat = `${generateAlphabeat('a', 'z')}${generateAlphabeat('A', 'Z')}`,
   length = 16,
-}: Options = {}): string {
+}: RandomStringOptions = {}): string {
   const alphabeatChars = [...new Set(alphabeat.split('')).values()]; // Filter out duplicates.
   const chars: string[] = [];
 

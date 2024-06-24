@@ -13,7 +13,7 @@ type Boundary = (typeof boundaries)[number];
 /**
  * The options for generating a random integer.
  */
-type Options = {
+export type RandomIntegerOptions = {
   /**
    * The maximum value.
    */
@@ -51,7 +51,7 @@ export function randomInteger({
   min,
   lowerBoundary = 'include',
   upperBoundary = 'include',
-}: Options): number {
+}: RandomIntegerOptions): number {
   if (!boundaries.includes(lowerBoundary)) {
     throw new Error(
       `Invalid lower boundary: ${lowerBoundary}. Expected ${boundaries.map((boundary) => `"${boundary}"`).join(', ')}.`,

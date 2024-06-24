@@ -1,15 +1,9 @@
-import {
-  Node,
-  Project,
-  type InterfaceDeclaration,
-  type SourceFile,
-  type TypeAliasDeclaration,
-} from 'ts-morph';
+import { InterfaceDeclaration, Project, TypeAliasDeclaration, type SourceFile } from 'ts-morph';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { randomInteger, randomString } from '$lib/utils/index.js';
 
-import { Svelte4Prop, resolveSvelte4Props, resolveSvelte4PropsNode } from './props.js';
+import { Svelte4Prop, resolveSvelte4Props } from './props.js';
 
 export function addPropsAsInterfaceDeclaration(
   props: Svelte4Prop[],
@@ -51,7 +45,7 @@ export function addPropsAsTypeAliasDeclaration(
 export function generateRandomProps(propsCount: number): Svelte4Prop[] {
   const props: Svelte4Prop[] = [];
 
-  for (let i = 0; i < propsCount; i++) {
+  for (let i = 0; i < propsCount; i += 1) {
     props.push(new Svelte4Prop(randomString()));
   }
 
@@ -133,80 +127,5 @@ describe(resolveSvelte4Props.name, () => {
 
       expect(matchingProp).not.toBeNull();
     }
-  });
-});
-
-describe(resolveSvelte4PropsNode.name, () => {
-  it('Should match the interface declaration', () => {
-    // Arrange
-    const props = generateRandomProps(
-      randomInteger({
-        max: 10,
-        min: 5,
-      }),
-    );
-
-    addPropsAsInterfaceDeclaration(props, propsSymbol, sourceFile);
-
-    // Act
-    const maybeNode = resolveSvelte4PropsNode(propsSymbol, sourceFile);
-
-    // Assert
-    expect(maybeNode).not.toBeNull();
-    expect(maybeNode).toBeInstanceOf(Node);
-  });
-
-  it('Should match the type alias declaration', () => {
-    // Arrange
-    const props = generateRandomProps(
-      randomInteger({
-        max: 10,
-        min: 5,
-      }),
-    );
-
-    addPropsAsTypeAliasDeclaration(props, propsSymbol, sourceFile);
-
-    // Act
-    const maybeNode = resolveSvelte4PropsNode(propsSymbol, sourceFile);
-
-    // Assert
-    expect(maybeNode).not.toBeNull();
-    expect(maybeNode).toBeInstanceOf(Node);
-  });
-
-  it('Should match nothing', () => {
-    // Arrange
-
-    // Act
-    const maybeNode = resolveSvelte4PropsNode(propsSymbol, sourceFile);
-
-    // Assert
-    expect(maybeNode).toBeNull();
-  });
-
-  it('Should throw an error if the symbol is ambiguous', () => {
-    // Arrange
-    const interfaceProps = generateRandomProps(
-      randomInteger({
-        max: 10,
-        min: 5,
-      }),
-    );
-    const typeAliasProps = generateRandomProps(
-      randomInteger({
-        max: 10,
-        min: 5,
-      }),
-    );
-
-    addPropsAsInterfaceDeclaration(interfaceProps, propsSymbol, sourceFile);
-    addPropsAsTypeAliasDeclaration(typeAliasProps, propsSymbol, sourceFile);
-
-    // Act
-    const action = () => resolveSvelte4PropsNode(propsSymbol, sourceFile);
-
-    // Assert
-    expect(action).toThrowError(Error);
   });
 });

@@ -1,4 +1,4 @@
-import type { Node, SourceFile } from 'ts-morph';
+import type { InterfaceDeclaration, TypeAliasDeclaration } from 'ts-morph';
 
 /**
  * A Svelte 4 slot property.
@@ -42,10 +42,12 @@ export class Svelte4Slot {
 /**
  * Resolve the Svelte 4 slots of a component.
  */
-export function resolveSvelte4Slots(node: Node): Svelte4Slot[] {
+export function resolveSvelte4Slots(
+  interfaceOrTypeAlias: InterfaceDeclaration | TypeAliasDeclaration,
+): Svelte4Slot[] {
   const slots: Svelte4Slot[] = [];
 
-  for (const symbol of node.getType().getProperties()) {
+  for (const symbol of interfaceOrTypeAlias.getType().getProperties()) {
     const properties: Svelte4SlotProperty[] = [];
 
     for (const prop of symbol.getValueDeclarationOrThrow().getType().getProperties()) {
@@ -56,22 +58,4 @@ export function resolveSvelte4Slots(node: Node): Svelte4Slot[] {
   }
 
   return slots;
-}
-
-/**
- * Resolve the node of the slots symbol.
- */
-export function resolveSvelte4SlotsNode(slotsSymbol: string, sourceFile: SourceFile): Node | null {
-  const interfaceDeclaration = sourceFile.getInterface(slotsSymbol) ?? null;
-  const typeAliasDeclaration = sourceFile.getTypeAlias(slotsSymbol) ?? null;
-
-  if (interfaceDeclaration && typeAliasDeclaration) {
-    throw new Error(
-      `Ambiguous slots symbol: "${slotsSymbol}". Found both an interface and a type alias.`,
-    );
-  }
-
-  const node = interfaceDeclaration ?? typeAliasDeclaration ?? null;
-
-  return node;
 }

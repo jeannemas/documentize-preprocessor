@@ -17,6 +17,7 @@ import {
   resolveConfig,
   type Config,
   type DataAttribute,
+  type ResolvedComponentConfig,
 } from './config.js';
 
 describe(resolveComponentConfig.name, () => {
@@ -29,9 +30,11 @@ describe(resolveComponentConfig.name, () => {
     const componentConfig = resolveComponentConfig(attributes, resolvedConfig);
 
     // Assert
-    expect(componentConfig).toHaveProperty('events', resolvedConfig.symbols.events);
-    expect(componentConfig).toHaveProperty('props', resolvedConfig.symbols.props);
-    expect(componentConfig).toHaveProperty('slots', resolvedConfig.symbols.slots);
+    expect(componentConfig).toMatchObject({
+      events: resolvedConfig.symbols.events,
+      props: resolvedConfig.symbols.props,
+      slots: resolvedConfig.symbols.slots,
+    } satisfies ResolvedComponentConfig);
   });
 
   it('Should resolve using the provided config', () => {
@@ -46,9 +49,11 @@ describe(resolveComponentConfig.name, () => {
     const componentConfig = resolveComponentConfig(attributes, resolvedConfig);
 
     // Assert
-    expect(componentConfig).toHaveProperty('events', eventsAttribute.value);
-    expect(componentConfig).toHaveProperty('props', propsAttribute.value);
-    expect(componentConfig).toHaveProperty('slots', slotsAttribute.value);
+    expect(componentConfig).toMatchObject({
+      events: eventsAttribute.value,
+      props: propsAttribute.value,
+      slots: slotsAttribute.value,
+    } satisfies ResolvedComponentConfig);
   });
 });
 
@@ -60,20 +65,21 @@ describe(resolveConfig.name, () => {
     const resolvedConfig = resolveConfig();
 
     // Assert
-    expect(resolvedConfig).toHaveProperty('dataAttributes');
-    expect(resolvedConfig.dataAttributes).toHaveProperty(
-      'description',
-      defaultDescriptionDataAttribute,
-    );
-    expect(resolvedConfig.dataAttributes).toHaveProperty('global', defaultGlobalDataAttribute);
-    expect(resolvedConfig.dataAttributes).toHaveProperty('events', defaultEventsDataAttribute);
-    expect(resolvedConfig.dataAttributes).toHaveProperty('props', defaultPropsDataAttribute);
-    expect(resolvedConfig.dataAttributes).toHaveProperty('slots', defaultSlotsDataAttribute);
-    expect(resolvedConfig).toHaveProperty('debug', defaultDebug);
-    expect(resolvedConfig).toHaveProperty('symbols');
-    expect(resolvedConfig.symbols).toHaveProperty('events', defaultEventsSymbol);
-    expect(resolvedConfig.symbols).toHaveProperty('props', defaultPropsSymbol);
-    expect(resolvedConfig.symbols).toHaveProperty('slots', defaultSlotsSymbol);
+    expect(resolvedConfig).toMatchObject({
+      dataAttributes: {
+        description: defaultDescriptionDataAttribute,
+        global: defaultGlobalDataAttribute,
+        events: defaultEventsDataAttribute,
+        props: defaultPropsDataAttribute,
+        slots: defaultSlotsDataAttribute,
+      },
+      debug: defaultDebug,
+      symbols: {
+        events: defaultEventsSymbol,
+        props: defaultPropsSymbol,
+        slots: defaultSlotsSymbol,
+      },
+    } satisfies Config);
   });
 
   it('Should resolve using the provided config', () => {
@@ -98,20 +104,21 @@ describe(resolveConfig.name, () => {
     const resolvedConfig = resolveConfig(config);
 
     // Assert
-    expect(resolvedConfig).toHaveProperty('dataAttributes');
-    expect(resolvedConfig.dataAttributes).toHaveProperty(
-      'description',
-      config.dataAttributes.description,
-    );
-    expect(resolvedConfig.dataAttributes).toHaveProperty('global', config.dataAttributes.global);
-    expect(resolvedConfig.dataAttributes).toHaveProperty('events', config.dataAttributes.events);
-    expect(resolvedConfig.dataAttributes).toHaveProperty('props', config.dataAttributes.props);
-    expect(resolvedConfig.dataAttributes).toHaveProperty('slots', config.dataAttributes.slots);
-    expect(resolvedConfig).toHaveProperty('debug', config.debug);
-    expect(resolvedConfig).toHaveProperty('symbols');
-    expect(resolvedConfig.symbols).toHaveProperty('events', config.symbols.events);
-    expect(resolvedConfig.symbols).toHaveProperty('props', config.symbols.props);
-    expect(resolvedConfig.symbols).toHaveProperty('slots', config.symbols.slots);
+    expect(resolvedConfig).toMatchObject({
+      dataAttributes: {
+        description: config.dataAttributes.description,
+        global: config.dataAttributes.global,
+        events: config.dataAttributes.events,
+        props: config.dataAttributes.props,
+        slots: config.dataAttributes.slots,
+      },
+      debug: config.debug,
+      symbols: {
+        events: config.symbols.events,
+        props: config.symbols.props,
+        slots: config.symbols.slots,
+      },
+    } satisfies Config);
   });
 
   it('Should throw when invalid data-attributes are provided', () => {
