@@ -1,13 +1,5 @@
-import {
-  InterfaceDeclaration,
-  Project,
-  TypeAliasDeclaration,
-  type OptionalKind,
-  type PropertySignatureStructure,
-  type SourceFile,
-  type WriterFunction,
-} from 'ts-morph';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { Project, type OptionalKind, type PropertySignatureStructure } from 'ts-morph';
+import { describe, expect, it } from 'vitest';
 
 import { generateAlphabeat } from '$lib/utils/alphabeat.js';
 import { randomInteger } from '$lib/utils/numbers.js';
@@ -17,162 +9,54 @@ import { Svelte4Event, resolveSvelte4Events } from './events.js';
 
 const simpleTypes = ['string', 'number', 'boolean'] as const;
 
-export function addEventsAsInterfaceDeclaration(
-  events: Svelte4Event[],
-  eventsSymbol: string,
-  sourceFile: SourceFile,
-): InterfaceDeclaration {
-  const interfaceDeclaration = sourceFile.addInterface({
-    name: eventsSymbol,
-    properties: events.map(({ name }) => ({
-      name,
-      type: (writer) => {
-        writer.write('unknown');
-      },
-    })),
-  });
-
-  return interfaceDeclaration;
-}
-
-export function addEventsAsTypeAliasDeclaration(
-  events: Svelte4Event[],
-  eventsSymbol: string,
-  sourceFile: SourceFile,
-): TypeAliasDeclaration {
-  const typeAliasDeclaration = sourceFile.addTypeAlias({
-    name: eventsSymbol,
-    type: (writer) => {
-      writer.block(() => {
-        for (const { name } of events) {
-          writer.writeLine(`${name}: unknown;`);
-        }
-      });
-    },
-  });
-
-  return typeAliasDeclaration;
-}
-
 export function generateRandomEvents(eventsCount: number): Svelte4Event[] {
   const events: Svelte4Event[] = [];
 
   for (let i = 0; i < eventsCount; i += 1) {
     events.push(
-      new Svelte4Event(
-        randomString({
+      new Svelte4Event({
+        name: randomString({
           alphabeat: generateAlphabeat('a', 'z'),
           length: randomInteger({
             max: 10,
             min: 1,
           }),
         }),
-      ),
+      }),
     );
   }
 
   return events;
 }
 
-export function generateSimpleInterfaceProperties(
-  propertyCount: number,
-): OptionalKind<PropertySignatureStructure>[] {
-  const properties: OptionalKind<PropertySignatureStructure>[] = [];
-
-  for (let propertyIndex = 0; propertyIndex < propertyCount; propertyIndex += 1) {
-    const name = randomString({
-      alphabeat: generateAlphabeat('a', 'z'),
-      length: randomInteger({
-        max: 5,
-        min: 1,
-      }),
-    });
-    const typeIndex = randomInteger({
-      max: simpleTypes.length,
-      min: 0,
-      upperBoundary: 'exclude',
-    });
-    const type = simpleTypes[typeIndex];
-    const property = {
-      name,
-      type,
-    } satisfies OptionalKind<PropertySignatureStructure>;
-
-    properties.push(property);
-  }
-
-  return properties;
-}
-
-export function generateSimpleTypeAlias(propertyCount: number): {
-  properties: OptionalKind<PropertySignatureStructure>[];
-  writerFunction: WriterFunction;
-} {
-  const properties: OptionalKind<PropertySignatureStructure>[] = [];
-
-  for (let propertyIndex = 0; propertyIndex < propertyCount; propertyIndex += 1) {
-    const name = randomString({
-      alphabeat: generateAlphabeat('a', 'z'),
-      length: randomInteger({
-        max: 5,
-        min: 1,
-      }),
-    });
-    const typeIndex = randomInteger({
-      max: simpleTypes.length,
-      min: 0,
-      upperBoundary: 'exclude',
-    });
-    const type = simpleTypes[typeIndex];
-
-    const property = {
-      name,
-      type,
-    } satisfies OptionalKind<PropertySignatureStructure>;
-
-    properties.push(property);
-  }
-
-  return {
-    properties,
-    writerFunction(writer) {
-      writer.block(() => {
-        for (const property of properties) {
-          writer.writeLine(`${property.name}: ${property.type};`);
-        }
-      });
-    },
-  };
-}
-
-let eventsSymbol: string;
-let project: Project;
-let sourceFile: SourceFile;
-
-beforeEach(() => {
-  eventsSymbol = randomString({
-    alphabeat: generateAlphabeat('a', 'z'),
-    length: 16,
-  });
-  project = new Project();
-  sourceFile = project.createSourceFile(
-    `${randomString({
-      alphabeat: generateAlphabeat('a', 'z'),
-      length: 16,
-    })}.ts`,
-  );
-});
-
 describe(resolveSvelte4Events.name, () => {
   it('Should match the interface declaration', () => {
     // Arrange
+    const project = new Project();
+    const sourceFile = project.createSourceFile(
+      `${randomString({
+        alphabeat: generateAlphabeat('a', 'z'),
+        length: 16,
+      })}.ts`,
+    );
     const events = generateRandomEvents(
       randomInteger({
         max: 10,
         min: 5,
       }),
     );
-    const interfaceDeclaration = addEventsAsInterfaceDeclaration(events, eventsSymbol, sourceFile);
+    const interfaceDeclaration = sourceFile.addInterface({
+      name: randomString({
+        alphabeat: generateAlphabeat('a', 'z'),
+        length: 16,
+      }),
+      properties: events.map((event) => ({
+        name: event.name,
+        type: (writer) => {
+          writer.write('any');
+        },
+      })),
+    });
 
     // Act
     const maybeEvents = resolveSvelte4Events(interfaceDeclaration);
@@ -199,13 +83,32 @@ describe(resolveSvelte4Events.name, () => {
 
   it('Should match the type alias declaration', () => {
     // Arrange
+    const project = new Project();
+    const sourceFile = project.createSourceFile(
+      `${randomString({
+        alphabeat: generateAlphabeat('a', 'z'),
+        length: 16,
+      })}.ts`,
+    );
     const events = generateRandomEvents(
       randomInteger({
         max: 10,
         min: 5,
       }),
     );
-    const typeAliasDeclaration = addEventsAsTypeAliasDeclaration(events, eventsSymbol, sourceFile);
+    const typeAliasDeclaration = sourceFile.addTypeAlias({
+      name: randomString({
+        alphabeat: generateAlphabeat('a', 'z'),
+        length: 16,
+      }),
+      type: (writer) => {
+        writer.block(() => {
+          for (const event of events) {
+            writer.writeLine(`${event.name}: any;`);
+          }
+        });
+      },
+    });
 
     // Act
     const maybeEvents = resolveSvelte4Events(typeAliasDeclaration);
@@ -232,13 +135,46 @@ describe(resolveSvelte4Events.name, () => {
 
   it('Should resolve simple interface', () => {
     // Arrange
+    const project = new Project();
+    const sourceFile = project.createSourceFile(
+      `${randomString({
+        alphabeat: generateAlphabeat('a', 'z'),
+        length: 16,
+      })}.ts`,
+    );
     const propertyCount = randomInteger({
       max: 10,
       min: 5,
     });
-    const properties = generateSimpleInterfaceProperties(propertyCount);
+    const properties: OptionalKind<PropertySignatureStructure>[] = [];
+
+    for (let propertyIndex = 0; propertyIndex < propertyCount; propertyIndex += 1) {
+      const name = randomString({
+        alphabeat: generateAlphabeat('a', 'z'),
+        length: randomInteger({
+          max: 5,
+          min: 1,
+        }),
+      });
+      const typeIndex = randomInteger({
+        max: simpleTypes.length,
+        min: 0,
+        upperBoundary: 'exclude',
+      });
+      const type = simpleTypes[typeIndex];
+      const property = {
+        name,
+        type,
+      } satisfies OptionalKind<PropertySignatureStructure>;
+
+      properties.push(property);
+    }
+
     const interfaceDeclaration = sourceFile.addInterface({
-      name: eventsSymbol,
+      name: randomString({
+        alphabeat: generateAlphabeat('a', 'z'),
+        length: 16,
+      }),
       properties,
     });
 
@@ -268,14 +204,54 @@ describe(resolveSvelte4Events.name, () => {
 
   it('Should resolve simple type alias', () => {
     // Arrange
+    const project = new Project();
+    const sourceFile = project.createSourceFile(
+      `${randomString({
+        alphabeat: generateAlphabeat('a', 'z'),
+        length: 16,
+      })}.ts`,
+    );
     const propertyCount = randomInteger({
       max: 10,
       min: 5,
     });
-    const { properties, writerFunction } = generateSimpleTypeAlias(propertyCount);
+    const properties: OptionalKind<PropertySignatureStructure>[] = [];
+
+    for (let propertyIndex = 0; propertyIndex < propertyCount; propertyIndex += 1) {
+      const name = randomString({
+        alphabeat: generateAlphabeat('a', 'z'),
+        length: randomInteger({
+          max: 5,
+          min: 1,
+        }),
+      });
+      const typeIndex = randomInteger({
+        max: simpleTypes.length,
+        min: 0,
+        upperBoundary: 'exclude',
+      });
+      const type = simpleTypes[typeIndex];
+
+      const property = {
+        name,
+        type,
+      } satisfies OptionalKind<PropertySignatureStructure>;
+
+      properties.push(property);
+    }
+
     const typeAliasDeclaration = sourceFile.addTypeAlias({
-      name: eventsSymbol,
-      type: writerFunction,
+      name: randomString({
+        alphabeat: generateAlphabeat('a', 'z'),
+        length: 16,
+      }),
+      type: (writer) => {
+        writer.block(() => {
+          for (const property of properties) {
+            writer.writeLine(`${property.name}: ${property.type};`);
+          }
+        });
+      },
     });
 
     // Act

@@ -63,12 +63,12 @@ export function generateRandomSlotProperty(propertyCount: number): Svelte4SlotPr
 
   for (let i = 0; i < propertyCount; i += 1) {
     properties.push(
-      new Svelte4SlotProperty(
-        randomString({
+      new Svelte4SlotProperty({
+        name: randomString({
           alphabeat: generateAlphabeat('a', 'z'),
           length: 16,
         }),
-      ),
+      }),
     );
   }
 
@@ -80,13 +80,13 @@ export function generateRandomSlots(slotsCount: number, propertyCount: number): 
 
   for (let i = 0; i < slotsCount; i += 1) {
     slots.push(
-      new Svelte4Slot(
-        randomString({
+      new Svelte4Slot({
+        name: randomString({
           alphabeat: generateAlphabeat('a', 'z'),
           length: 16,
         }),
-        generateRandomSlotProperty(propertyCount),
-      ),
+        properties: generateRandomSlotProperty(propertyCount),
+      }),
     );
   }
 

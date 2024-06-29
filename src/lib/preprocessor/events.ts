@@ -14,7 +14,7 @@ export class Svelte4Event {
   /**
    * Create a new Svelte 4 event.
    */
-  constructor(name: string) {
+  constructor({ name }: Pick<Svelte4Event, 'name'>) {
     this.name = name;
   }
 }
@@ -26,9 +26,12 @@ export function resolveSvelte4Events(
   interfaceOrTypeAlias: InterfaceDeclaration | TypeAliasDeclaration,
 ): Svelte4Event[] {
   const events: Svelte4Event[] = [];
+  const type = interfaceOrTypeAlias.getType();
 
-  for (const property of extractProperties(interfaceOrTypeAlias)) {
-    const event = new Svelte4Event(property.name);
+  for (const property of extractProperties(type)) {
+    const event = new Svelte4Event({
+      name: property.name,
+    });
 
     events.push(event);
   }

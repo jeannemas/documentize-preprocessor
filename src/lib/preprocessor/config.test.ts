@@ -41,27 +41,27 @@ describe(resolveComponentConfig.name, () => {
   it('Should resolve using the provided config', () => {
     // Arrange
     const resolvedConfig = resolveConfig();
-    const eventsAttribute = new Attribute(
-      resolvedConfig.dataAttributes.events,
-      randomString({
+    const eventsAttribute = new Attribute({
+      name: resolvedConfig.dataAttributes.events,
+      value: randomString({
         alphabeat: generateAlphabeat('a', 'z'),
         length: 16,
       }),
-    );
-    const propsAttribute = new Attribute(
-      resolvedConfig.dataAttributes.props,
-      randomString({
+    });
+    const propsAttribute = new Attribute({
+      name: resolvedConfig.dataAttributes.props,
+      value: randomString({
         alphabeat: generateAlphabeat('a', 'z'),
         length: 16,
       }),
-    );
-    const slotsAttribute = new Attribute(
-      resolvedConfig.dataAttributes.slots,
-      randomString({
+    });
+    const slotsAttribute = new Attribute({
+      name: resolvedConfig.dataAttributes.slots,
+      value: randomString({
         alphabeat: generateAlphabeat('a', 'z'),
         length: 16,
       }),
-    );
+    });
     const attributes = [eventsAttribute, propsAttribute, slotsAttribute];
 
     // Act

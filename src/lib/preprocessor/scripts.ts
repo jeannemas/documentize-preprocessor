@@ -18,7 +18,7 @@ export class Svelte4Script {
   /**
    * Create a new script tag.
    */
-  constructor(attributes: Attribute[], content: string) {
+  constructor({ attributes, content }: Pick<Svelte4Script, 'attributes' | 'content'>) {
     this.attributes = attributes;
     this.content = content;
   }
@@ -71,7 +71,12 @@ export function extractScripts(content: string): Svelte4Script[] {
   for (const execArray of content.matchAll(scriptRegex)) {
     const [, , rawAttributes, rawContent] = execArray;
 
-    scripts.push(new Svelte4Script(parseAttributes(rawAttributes), rawContent));
+    scripts.push(
+      new Svelte4Script({
+        attributes: parseAttributes(rawAttributes),
+        content: rawContent,
+      }),
+    );
   }
 
   return scripts;

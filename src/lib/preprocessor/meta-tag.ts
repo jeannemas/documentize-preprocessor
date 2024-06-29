@@ -17,7 +17,7 @@ export class MetaTag {
   /**
    * Create a new meta tag.
    */
-  constructor(attributes: Attribute[], regex: RegExp) {
+  constructor({ attributes, regex }: Pick<MetaTag, 'attributes' | 'regex'>) {
     this.attributes = attributes;
     this.regex = regex;
   }
@@ -39,7 +39,12 @@ export function extractMetaTag(
   for (const execArray of content.matchAll(metaRegex)) {
     const [, , rawAttributes] = execArray;
 
-    metaTags.push(new MetaTag(parseAttributes(rawAttributes), metaRegex));
+    metaTags.push(
+      new MetaTag({
+        attributes: parseAttributes(rawAttributes),
+        regex: metaRegex,
+      }),
+    );
   }
 
   if (metaTags.length > 1) {

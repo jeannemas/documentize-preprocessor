@@ -1,4 +1,4 @@
-import type { Node } from 'ts-morph';
+import type { Type } from 'ts-morph';
 
 /**
  * A property.
@@ -16,7 +16,7 @@ export class Property {
   /**
    * Create a new property.
    */
-  constructor(name: string, type: string) {
+  constructor({ name, type }: Pick<Property, 'name' | 'type'>) {
     this.name = name;
     this.type = type;
   }
@@ -25,12 +25,14 @@ export class Property {
 /**
  * Extract the properties of a node.
  */
-export function extractProperties(node: Node): Property[] {
-  const type = node.getType();
+export function extractProperties(type: Type): Property[] {
   const properties: Property[] = [];
 
   for (const symbol of type.getProperties()) {
-    const property = new Property(symbol.getName(), symbol.getDeclaredType().getText());
+    const property = new Property({
+      name: symbol.getName(),
+      type: symbol.getDeclaredType().getText(),
+    });
 
     properties.push(property);
   }

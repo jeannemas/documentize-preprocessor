@@ -1,5 +1,7 @@
 import type { InterfaceDeclaration, TypeAliasDeclaration } from 'ts-morph';
 
+import { extractProperties } from './types.js';
+
 /**
  * A Svelte 4 slot property.
  */
@@ -12,7 +14,7 @@ export class Svelte4SlotProperty {
   /**
    * Create a new Svelte 4 slot property.
    */
-  constructor(name: string) {
+  constructor({ name }: Pick<Svelte4SlotProperty, 'name'>) {
     this.name = name;
   }
 }
@@ -33,7 +35,7 @@ export class Svelte4Slot {
   /**
    * Create a new Svelte 4 slot.
    */
-  constructor(name: string, properties: Svelte4SlotProperty[]) {
+  constructor({ name, properties }: Pick<Svelte4Slot, 'name' | 'properties'>) {
     this.name = name;
     this.properties = properties;
   }
@@ -46,15 +48,20 @@ export function resolveSvelte4Slots(
   interfaceOrTypeAlias: InterfaceDeclaration | TypeAliasDeclaration,
 ): Svelte4Slot[] {
   const slots: Svelte4Slot[] = [];
+  const type = interfaceOrTypeAlias.getType();
 
-  for (const symbol of interfaceOrTypeAlias.getType().getProperties()) {
-    const properties: Svelte4SlotProperty[] = [];
+  for (const property of extractProperties(type)) {
+    const slot = new Svelte4Slot({
+      name: property.name,
+      properties: extractProperties(type.getPropertyOrThrow(property.name).getDeclaredType()).map(
+        (prop) =>
+          new Svelte4SlotProperty({
+            name: prop.name,
+          }),
+      ),
+    });
 
-    for (const prop of symbol.getValueDeclarationOrThrow().getType().getProperties()) {
-      properties.push(new Svelte4SlotProperty(prop.getName()));
-    }
-
-    slots.push(new Svelte4Slot(symbol.getName(), properties));
+    slots.push(slot);
   }
 
   return slots;

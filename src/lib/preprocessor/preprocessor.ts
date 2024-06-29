@@ -47,13 +47,13 @@ export class Svelte4Metadata {
   /**
    * Create a new metadata.
    */
-  constructor(
-    filename: string,
-    description: string,
-    events: Svelte4Event[],
-    props: Svelte4Prop[],
-    slots: Svelte4Slot[],
-  ) {
+  constructor({
+    description,
+    events,
+    filename,
+    props,
+    slots,
+  }: Pick<Svelte4Metadata, 'description' | 'events' | 'filename' | 'props' | 'slots'>) {
     this.filename = filename;
     this.description = description;
     this.events = events;
@@ -205,7 +205,13 @@ ${extractScriptNotContextModule(content)?.content ?? ''}
     const events = eventsNode ? resolveSvelte4Events(eventsNode) : [];
     const props = propsNode ? resolveSvelte4Props(propsNode) : [];
     const slots = slotsNode ? resolveSvelte4Slots(slotsNode) : [];
-    const metadata = new Svelte4Metadata(filename, description, events, props, slots);
+    const metadata = new Svelte4Metadata({
+      description,
+      events,
+      filename,
+      props,
+      slots,
+    });
 
     if (!eventsNode) {
       this.#logger.warn(

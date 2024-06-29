@@ -23,13 +23,13 @@ describe(resolveDescription.name, () => {
   it('Should resolve using the provided description', () => {
     // Arrange
     const resolvedConfig = resolveConfig();
-    const descriptionAttribute = new Attribute(
-      resolvedConfig.dataAttributes.description,
-      randomString({
+    const descriptionAttribute = new Attribute({
+      name: resolvedConfig.dataAttributes.description,
+      value: randomString({
         alphabeat: generateAlphabeat('a', 'z'),
         length: 16,
       }),
-    );
+    });
     const attributes = [descriptionAttribute] satisfies Attribute[];
 
     // Act

@@ -99,7 +99,7 @@ describe(extractProperties.name, () => {
     });
 
     // Act
-    const extractedProperties = extractProperties(interfaceDeclaration);
+    const extractedProperties = extractProperties(interfaceDeclaration.getType());
 
     // Assert
     expect(extractedProperties).toBeInstanceOf(Array);
@@ -161,7 +161,7 @@ describe(extractProperties.name, () => {
     ]);
 
     // Act
-    const extractedProperties = extractProperties(interface_B_declaration);
+    const extractedProperties = extractProperties(interface_B_declaration.getType());
 
     // Assert
     expect(extractedProperties).toBeInstanceOf(Array);
@@ -239,7 +239,7 @@ describe(extractProperties.name, () => {
     });
 
     // Act
-    const extractedProperties = extractProperties(interface_B_declaration);
+    const extractedProperties = extractProperties(interface_B_declaration.getType());
 
     // Assert
     expect(extractedProperties).toBeInstanceOf(Array);
@@ -285,7 +285,7 @@ describe(extractProperties.name, () => {
     });
 
     // Act
-    const extractedProperties = extractProperties(typeAliasDeclaration);
+    const extractedProperties = extractProperties(typeAliasDeclaration.getType());
 
     // Assert
     expect(extractedProperties).toBeInstanceOf(Array);
@@ -363,7 +363,7 @@ describe(extractProperties.name, () => {
     ]);
 
     // Act
-    const extractedProperties = extractProperties(typeAlias_C_declaration);
+    const extractedProperties = extractProperties(typeAlias_C_declaration.getType());
 
     // Assert
     expect(extractedProperties).toBeInstanceOf(Array);

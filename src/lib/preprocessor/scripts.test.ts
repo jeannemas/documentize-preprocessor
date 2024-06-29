@@ -24,14 +24,34 @@ ${content}
  * Generate a script tag with the `context="module"` attribute.
  */
 export function generateScriptContextModule(content: string): string {
-  return generateScript([new Attribute('context', 'module'), new Attribute('lang', 'ts')], content);
+  return generateScript(
+    [
+      new Attribute({
+        name: 'context',
+        value: 'module',
+      }),
+      new Attribute({
+        name: 'lang',
+        value: 'ts',
+      }),
+    ],
+    content,
+  );
 }
 
 /**
  * Generate a script tag without the `context="module"` attribute.
  */
 export function generateScriptNotContextModule(content: string): string {
-  return generateScript([new Attribute('lang', 'ts')], content);
+  return generateScript(
+    [
+      new Attribute({
+        name: 'lang',
+        value: 'ts',
+      }),
+    ],
+    content,
+  );
 }
 
 const sampleScriptContextModule = generateScriptContextModule(`
@@ -62,7 +82,12 @@ describe(extractScriptContextModule.name, () => {
     // Assert
     expect(script).not.toBeNull();
     expect(script).toBeInstanceOf(Svelte4Script);
-    expect(script!.attributes).toContainEqual(new Attribute('context', 'module'));
+    expect(script!.attributes).toContainEqual(
+      new Attribute({
+        name: 'context',
+        value: 'module',
+      }),
+    );
   });
 
   it('Should extract nothing', () => {
@@ -107,7 +132,12 @@ describe(extractScriptNotContextModule.name, () => {
     // Assert
     expect(script).not.toBeNull();
     expect(script).toBeInstanceOf(Svelte4Script);
-    expect(script!.attributes).not.toContainEqual(new Attribute('context', 'module'));
+    expect(script!.attributes).not.toContainEqual(
+      new Attribute({
+        name: 'context',
+        value: 'module',
+      }),
+    );
   });
 
   it('Should extract nothing', () => {
@@ -174,7 +204,12 @@ Lorem ipsum
     // Assert
     expect(scripts).toBeInstanceOf(Array);
     expect(scripts).toHaveLength(1);
-    expect(scripts[0].attributes).toContainEqual(new Attribute('context', 'module'));
+    expect(scripts[0].attributes).toContainEqual(
+      new Attribute({
+        name: 'context',
+        value: 'module',
+      }),
+    );
   });
 
   it('Should extract 1 script', () => {
@@ -193,6 +228,11 @@ Lorem ipsum
     // Assert
     expect(scripts).toBeInstanceOf(Array);
     expect(scripts).toHaveLength(1);
-    expect(scripts[0].attributes).not.toContainEqual(new Attribute('context', 'module'));
+    expect(scripts[0].attributes).not.toContainEqual(
+      new Attribute({
+        name: 'context',
+        value: 'module',
+      }),
+    );
   });
 });

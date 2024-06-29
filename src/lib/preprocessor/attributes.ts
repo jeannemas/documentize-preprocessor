@@ -25,7 +25,7 @@ export class Attribute {
   /**
    * Create a new attribute.
    */
-  constructor(name: string, value: string) {
+  constructor({ name, value }: Pick<Attribute, 'name' | 'value'>) {
     this.name = name;
     this.value = value;
   }
@@ -52,7 +52,10 @@ export function parseAttributes(attributesString: string, defaultValue = ''): At
       throw new Error(`Duplicate attribute "${rawName}" found. This is not valid HTML.`);
     }
 
-    const attribute = new Attribute(rawName, rawValue1 || rawValue2 || defaultValue);
+    const attribute = new Attribute({
+      name: rawName,
+      value: rawValue1 || rawValue2 || defaultValue,
+    });
 
     attributes.push(attribute);
   }

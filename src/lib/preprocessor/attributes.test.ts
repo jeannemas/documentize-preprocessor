@@ -39,16 +39,16 @@ describe(parseAttributes.name, () => {
     const attributes = Array.from(
       { length: attributesCount },
       () =>
-        new Attribute(
-          randomString({
+        new Attribute({
+          name: randomString({
             alphabeat: generateAlphabeat('a', 'z'),
             length: 16,
-          }), // Random name
-          randomString({
+          }),
+          value: randomString({
             alphabeat: generateAlphabeat('a', 'z'),
             length: 16,
-          }), // Random value
-        ),
+          }),
+        }),
     );
     const attributesNames = attributes.map(({ name }) => name);
     const attributesString = compileAttributesIntoString(attributes);
@@ -75,13 +75,13 @@ describe(parseAttributes.name, () => {
     const attributes = Array.from(
       { length: attributesCount },
       () =>
-        new Attribute(
-          randomString({
+        new Attribute({
+          name: randomString({
             alphabeat: generateAlphabeat('a', 'z'),
             length: 16,
           }),
-          '',
-        ),
+          value: '',
+        }),
     );
     const attributesNames = attributes.map(({ name }) => name);
     const attributesString = compileAttributesIntoString(attributes);
@@ -101,7 +101,16 @@ describe(parseAttributes.name, () => {
 
   it('Should throw an error', () => {
     // Arrange
-    const attributes = [new Attribute('a', 'foo'), new Attribute('a', 'bar')] satisfies Attribute[];
+    const attributes = [
+      new Attribute({
+        name: 'a',
+        value: 'foo',
+      }),
+      new Attribute({
+        name: 'a',
+        value: 'bar',
+      }),
+    ] satisfies Attribute[];
     const rawAttributes = compileAttributesIntoString(attributes);
 
     // Act

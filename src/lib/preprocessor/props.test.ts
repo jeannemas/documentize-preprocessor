@@ -49,12 +49,12 @@ export function generateRandomProps(propsCount: number): Svelte4Prop[] {
 
   for (let i = 0; i < propsCount; i += 1) {
     props.push(
-      new Svelte4Prop(
-        randomString({
+      new Svelte4Prop({
+        name: randomString({
           alphabeat: generateAlphabeat('a', 'z'),
           length: 16,
         }),
-      ),
+      }),
     );
   }
 
