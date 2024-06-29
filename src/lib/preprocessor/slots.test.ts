@@ -1,62 +1,11 @@
-import {
-  Project,
-  type InterfaceDeclaration,
-  type SourceFile,
-  type TypeAliasDeclaration,
-} from 'ts-morph';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { Project } from 'ts-morph';
+import { describe, expect, it } from 'vitest';
 
 import { generateAlphabeat } from '$lib/utils/alphabeat.js';
 import { randomInteger } from '$lib/utils/numbers.js';
 import { randomString } from '$lib/utils/strings.js';
 
 import { Svelte4Slot, Svelte4SlotProperty, resolveSvelte4Slots } from './slots.js';
-
-export function addSlotsAsInterfaceDeclaration(
-  slots: Svelte4Slot[],
-  slotsSymbol: string,
-  sourceFile: SourceFile,
-): InterfaceDeclaration {
-  const interfaceDeclaration = sourceFile.addInterface({
-    name: slotsSymbol,
-    properties: slots.map(({ name, properties }) => ({
-      name,
-      type: (writer) => {
-        writer.block(() => {
-          for (const { name } of properties) {
-            writer.writeLine(`${name}: unknown;`);
-          }
-        });
-      },
-    })),
-  });
-
-  return interfaceDeclaration;
-}
-
-export function addPropsAsTypeAliasDeclaration(
-  slots: Svelte4Slot[],
-  slotsSymbol: string,
-  sourceFile: SourceFile,
-): TypeAliasDeclaration {
-  const typeAliasDeclaration = sourceFile.addTypeAlias({
-    name: slotsSymbol,
-    type: (writer) => {
-      writer.block(() => {
-        for (const { name, properties } of slots) {
-          writer.writeLine(`${name}: `);
-          writer.block(() => {
-            for (const { name } of properties) {
-              writer.writeLine(`${name}: unknown;`);
-            }
-          });
-        }
-      });
-    },
-  });
-
-  return typeAliasDeclaration;
-}
 
 export function generateRandomSlotProperty(propertyCount: number): Svelte4SlotProperty[] {
   const properties: Svelte4SlotProperty[] = [];
@@ -93,27 +42,16 @@ export function generateRandomSlots(slotsCount: number, propertyCount: number): 
   return slots;
 }
 
-let project: Project;
-let slotsSymbol: string;
-let sourceFile: SourceFile;
-
-beforeEach(() => {
-  project = new Project();
-  slotsSymbol = randomString({
-    alphabeat: generateAlphabeat('a', 'z'),
-    length: 16,
-  });
-  sourceFile = project.createSourceFile(
-    `${randomString({
-      alphabeat: generateAlphabeat('a', 'z'),
-      length: 16,
-    })}.ts`,
-  );
-});
-
 describe(resolveSvelte4Slots.name, () => {
   it('Should match the interface declaration', () => {
     // Arrange
+    const project = new Project();
+    const sourceFile = project.createSourceFile(
+      `${randomString({
+        alphabeat: generateAlphabeat('a', 'z'),
+        length: 16,
+      })}.ts`,
+    );
     const slots = generateRandomSlots(
       randomInteger({
         max: 10,
@@ -124,7 +62,22 @@ describe(resolveSvelte4Slots.name, () => {
         min: 5,
       }),
     );
-    const interfaceDeclaration = addSlotsAsInterfaceDeclaration(slots, slotsSymbol, sourceFile);
+    const interfaceDeclaration = sourceFile.addInterface({
+      name: randomString({
+        alphabeat: generateAlphabeat('a', 'z'),
+        length: 16,
+      }),
+      properties: slots.map(({ name, properties }) => ({
+        name,
+        type: (writer) => {
+          writer.block(() => {
+            for (const { name } of properties) {
+              writer.writeLine(`${name}: any;`);
+            }
+          });
+        },
+      })),
+    });
 
     // Act
     const maybeSlots = resolveSvelte4Slots(interfaceDeclaration);
@@ -151,6 +104,13 @@ describe(resolveSvelte4Slots.name, () => {
 
   it('Should match the type alias declaration', () => {
     // Arrange
+    const project = new Project();
+    const sourceFile = project.createSourceFile(
+      `${randomString({
+        alphabeat: generateAlphabeat('a', 'z'),
+        length: 16,
+      })}.ts`,
+    );
     const slots = generateRandomSlots(
       randomInteger({
         max: 10,
@@ -161,7 +121,24 @@ describe(resolveSvelte4Slots.name, () => {
         min: 5,
       }),
     );
-    const typeAliasDeclaration = addPropsAsTypeAliasDeclaration(slots, slotsSymbol, sourceFile);
+    const typeAliasDeclaration = sourceFile.addTypeAlias({
+      name: randomString({
+        alphabeat: generateAlphabeat('a', 'z'),
+        length: 16,
+      }),
+      type: (writer) => {
+        writer.block(() => {
+          for (const { name, properties } of slots) {
+            writer.writeLine(`${name}: `);
+            writer.block(() => {
+              for (const { name } of properties) {
+                writer.writeLine(`${name}: any;`);
+              }
+            });
+          }
+        });
+      },
+    });
 
     // Act
     const maybeSlots = resolveSvelte4Slots(typeAliasDeclaration);

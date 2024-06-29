@@ -1,48 +1,11 @@
-import { InterfaceDeclaration, Project, TypeAliasDeclaration, type SourceFile } from 'ts-morph';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { Project } from 'ts-morph';
+import { describe, expect, it } from 'vitest';
 
 import { generateAlphabeat } from '$lib/utils/alphabeat.js';
 import { randomInteger } from '$lib/utils/numbers.js';
 import { randomString } from '$lib/utils/strings.js';
 
 import { Svelte4Prop, resolveSvelte4Props } from './props.js';
-
-export function addPropsAsInterfaceDeclaration(
-  props: Svelte4Prop[],
-  propsSymbol: string,
-  sourceFile: SourceFile,
-): InterfaceDeclaration {
-  const interfaceDeclaration = sourceFile.addInterface({
-    name: propsSymbol,
-    properties: props.map(({ name }) => ({
-      name,
-      type: (writer) => {
-        writer.write('unknown');
-      },
-    })),
-  });
-
-  return interfaceDeclaration;
-}
-
-export function addPropsAsTypeAliasDeclaration(
-  props: Svelte4Prop[],
-  propsSymbol: string,
-  sourceFile: SourceFile,
-): TypeAliasDeclaration {
-  const typeAliasDeclaration = sourceFile.addTypeAlias({
-    name: propsSymbol,
-    type: (writer) => {
-      writer.block(() => {
-        for (const { name } of props) {
-          writer.writeLine(`${name}: unknown;`);
-        }
-      });
-    },
-  });
-
-  return typeAliasDeclaration;
-}
 
 export function generateRandomProps(propsCount: number): Svelte4Prop[] {
   const props: Svelte4Prop[] = [];
@@ -61,34 +24,34 @@ export function generateRandomProps(propsCount: number): Svelte4Prop[] {
   return props;
 }
 
-let project: Project;
-let propsSymbol: string;
-let sourceFile: SourceFile;
-
-beforeEach(() => {
-  project = new Project();
-  propsSymbol = randomString({
-    alphabeat: generateAlphabeat('a', 'z'),
-    length: 16,
-  });
-  sourceFile = project.createSourceFile(
-    `${randomString({
-      alphabeat: generateAlphabeat('a', 'z'),
-      length: 16,
-    })}.ts`,
-  );
-});
-
 describe(resolveSvelte4Props.name, () => {
   it('Should match the interface declaration', () => {
     // Arrange
+    const project = new Project();
+    const sourceFile = project.createSourceFile(
+      `${randomString({
+        alphabeat: generateAlphabeat('a', 'z'),
+        length: 16,
+      })}.ts`,
+    );
     const props = generateRandomProps(
       randomInteger({
         max: 10,
         min: 5,
       }),
     );
-    const interfaceDeclaration = addPropsAsInterfaceDeclaration(props, propsSymbol, sourceFile);
+    const interfaceDeclaration = sourceFile.addInterface({
+      name: randomString({
+        alphabeat: generateAlphabeat('a', 'z'),
+        length: 16,
+      }),
+      properties: props.map(({ name }) => ({
+        name,
+        type: (writer) => {
+          writer.write('any');
+        },
+      })),
+    });
 
     // Act
     const maybeProps = resolveSvelte4Props(interfaceDeclaration);
@@ -115,13 +78,32 @@ describe(resolveSvelte4Props.name, () => {
 
   it('Should match the type alias declaration', () => {
     // Arrange
+    const project = new Project();
+    const sourceFile = project.createSourceFile(
+      `${randomString({
+        alphabeat: generateAlphabeat('a', 'z'),
+        length: 16,
+      })}.ts`,
+    );
     const props = generateRandomProps(
       randomInteger({
         max: 10,
         min: 5,
       }),
     );
-    const typeAliasDeclaration = addPropsAsTypeAliasDeclaration(props, propsSymbol, sourceFile);
+    const typeAliasDeclaration = sourceFile.addTypeAlias({
+      name: randomString({
+        alphabeat: generateAlphabeat('a', 'z'),
+        length: 16,
+      }),
+      type: (writer) => {
+        writer.block(() => {
+          for (const { name } of props) {
+            writer.writeLine(`${name}: any;`);
+          }
+        });
+      },
+    });
 
     // Act
     const maybeProps = resolveSvelte4Props(typeAliasDeclaration);
