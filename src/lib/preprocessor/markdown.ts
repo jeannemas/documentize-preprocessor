@@ -77,7 +77,7 @@ function createEventsSection(events: Svelte4Event[]): Markdown.Section {
     const rows: Markdown.Table.Row[] = [];
 
     // Sort events by name alphabetically
-    for (const event of events.toSorted((a, b) => a.name.localeCompare(b.name))) {
+    for (const event of events.sort((a, b) => a.name.localeCompare(b.name))) {
       rows.push(
         new Markdown.Table.Row(new Markdown.Table.Cell(new Markdown.Text(`\`${event.name}\``))),
       );
@@ -108,7 +108,7 @@ function createPropsSection(props: Svelte4Prop[]): Markdown.Section {
     const rows: Markdown.Table.Row[] = [];
 
     // Sort props by name alphabetically
-    for (const prop of props.toSorted((a, b) => a.name.localeCompare(b.name))) {
+    for (const prop of props.sort((a, b) => a.name.localeCompare(b.name))) {
       rows.push(
         new Markdown.Table.Row(
           new Markdown.Table.Cell(new Markdown.Text(`\`${prop.name}\``)),
@@ -138,7 +138,7 @@ function createSlotsSection(slots: Svelte4Slot[]): Markdown.Section {
     const rows: Markdown.Table.Row[] = [];
 
     // Sort slots by name alphabetically
-    for (const slot of slots.toSorted((a, b) => a.name.localeCompare(b.name))) {
+    for (const slot of slots.sort((a, b) => a.name.localeCompare(b.name))) {
       rows.push(
         new Markdown.Table.Row(
           new Markdown.Table.Cell(new Markdown.Text(`\`${slot.name}\``)),
@@ -146,7 +146,7 @@ function createSlotsSection(slots: Svelte4Slot[]): Markdown.Section {
         ),
       );
 
-      for (const property of slot.properties.toSorted((a, b) => a.name.localeCompare(b.name))) {
+      for (const property of slot.properties.sort((a, b) => a.name.localeCompare(b.name))) {
         rows.push(
           new Markdown.Table.Row(
             new Markdown.Table.Cell(),
