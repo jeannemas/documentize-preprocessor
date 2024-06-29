@@ -19,7 +19,7 @@ export class Heading extends ContainerNode<InlineNode> {
    *
    * For example, `1` for an `<h1>`, `2` for an `<h2>`, etc.
    */
-  #level: HeadingLevel;
+  private readonly _level: HeadingLevel;
 
   /**
    * Create a new heading.
@@ -33,7 +33,7 @@ export class Heading extends ContainerNode<InlineNode> {
       );
     }
 
-    this.#level = level;
+    this._level = level;
   }
 
   /**
@@ -43,6 +43,6 @@ export class Heading extends ContainerNode<InlineNode> {
     const nodes = this._nodes;
     const markdown = nodes.map((node) => node.asString()).join(' ');
 
-    return `\n${'#'.repeat(this.#level)} ${markdown.trim()}\n`;
+    return `\n${'#'.repeat(this._level)} ${markdown.trim()}\n`;
   }
 }

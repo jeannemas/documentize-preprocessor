@@ -7,7 +7,7 @@ export class Text extends InlineNode {
   /**
    * The text of the node.
    */
-  #text: string;
+  private readonly _text: string;
 
   /**
    * Create a new text node.
@@ -15,14 +15,14 @@ export class Text extends InlineNode {
   constructor(text: string) {
     super();
 
-    this.#text = text;
+    this._text = text;
   }
 
   /**
    * Convert the text node to a markdown string.
    */
   override asString(): string {
-    const text = this.#text;
+    const text = this._text;
 
     return `${text}`;
   }
