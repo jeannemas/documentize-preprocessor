@@ -1,5 +1,11 @@
 # @jeanne-mas/documentize-preprocessor
 
+## 0.1.0
+
+### Minor Changes
+
+- 8d76490: Reworked preprocessor to better extract metadata from components
+
 ## 0.0.7
 
 ### Patch Changes
