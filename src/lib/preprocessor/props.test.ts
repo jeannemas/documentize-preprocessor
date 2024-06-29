@@ -1,7 +1,9 @@
 import { InterfaceDeclaration, Project, TypeAliasDeclaration, type SourceFile } from 'ts-morph';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { randomInteger, randomString } from '$lib/utils/index.js';
+import { generateAlphabeat } from '$lib/utils/alphabeat.js';
+import { randomInteger } from '$lib/utils/numbers.js';
+import { randomString } from '$lib/utils/strings.js';
 
 import { Svelte4Prop, resolveSvelte4Props } from './props.js';
 
@@ -46,7 +48,14 @@ export function generateRandomProps(propsCount: number): Svelte4Prop[] {
   const props: Svelte4Prop[] = [];
 
   for (let i = 0; i < propsCount; i += 1) {
-    props.push(new Svelte4Prop(randomString()));
+    props.push(
+      new Svelte4Prop(
+        randomString({
+          alphabeat: generateAlphabeat('a', 'z'),
+          length: 16,
+        }),
+      ),
+    );
   }
 
   return props;
@@ -58,8 +67,16 @@ let sourceFile: SourceFile;
 
 beforeEach(() => {
   project = new Project();
-  propsSymbol = randomString();
-  sourceFile = project.createSourceFile(`${randomString()}.ts`);
+  propsSymbol = randomString({
+    alphabeat: generateAlphabeat('a', 'z'),
+    length: 16,
+  });
+  sourceFile = project.createSourceFile(
+    `${randomString({
+      alphabeat: generateAlphabeat('a', 'z'),
+      length: 16,
+    })}.ts`,
+  );
 });
 
 describe(resolveSvelte4Props.name, () => {

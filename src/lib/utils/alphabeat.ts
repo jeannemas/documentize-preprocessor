@@ -1,5 +1,5 @@
 /**
- * Generate an alphabeat as string from a char to another char.
+ * Generate an alphabeat of chars from a char to another char.
  * The alphabeat is generated in the ASCII order.
  *
  * @param fromChar The first char of the alphabeat.
@@ -7,7 +7,7 @@
  * @throws When either char are not a single character.
  * @throws When the `fromChar` ASCII code is greater than the `toChar` one.
  */
-export function generateAlphabeat(fromChar: string, toChar: string): string {
+export function generateAlphabeat(fromChar: string, toChar: string): string[] {
   if (fromChar.length !== 1) {
     throw new Error('The `fromChar` must be a single character.');
   }
@@ -30,5 +30,5 @@ export function generateAlphabeat(fromChar: string, toChar: string): string {
     chars.push(char);
   }
 
-  return chars.join('');
+  return chars;
 }

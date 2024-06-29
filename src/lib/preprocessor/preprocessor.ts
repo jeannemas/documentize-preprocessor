@@ -150,6 +150,10 @@ export class Preprocessor implements PreprocessorGroup {
    */
   #logger: Logger;
   /**
+   * The project for the preprocessor.
+   */
+  #project: Project;
+  /**
    * The resolved configuration for the preprocessor.
    */
   #resolvedConfig: ResolvedConfig;
@@ -159,8 +163,9 @@ export class Preprocessor implements PreprocessorGroup {
   /**
    * Create a new preprocessor.
    */
-  constructor(logger: Logger, resolvedConfig: ResolvedConfig) {
+  constructor(logger: Logger, project: Project, resolvedConfig: ResolvedConfig) {
     this.#logger = logger;
+    this.#project = project;
     this.#resolvedConfig = resolvedConfig;
 
     logger.info('Global config', resolvedConfig);
@@ -170,8 +175,7 @@ export class Preprocessor implements PreprocessorGroup {
    * Extract the metadata from the Svelte component.
    */
   extractComponentMetadata(filename: string, content: string, metaTag: MetaTag): Svelte4Metadata {
-    const project = new Project();
-    const sourceFile = project.createSourceFile(
+    const sourceFile = this.#project.createSourceFile(
       join(filename, `${Date.now()}.ts`), // We need to provide a unique filename to avoid race conflicts.
       `
 ${extractScriptContextModule(content)?.content ?? ''}
@@ -285,10 +289,16 @@ ${extractScriptNotContextModule(content)?.content ?? ''}
   /**
    * Create a new preprocessor with the provided configuration.
    */
-  static create(config: Config = {}): Preprocessor {
+  static create(
+    tsConfigFilePath: string | undefined = undefined,
+    config: Config = {},
+  ): Preprocessor {
     const resolvedConfig = resolveConfig(config);
     const logger = new Logger(console, resolvedConfig.debug);
+    const project = new Project({
+      tsConfigFilePath,
+    });
 
-    return new Preprocessor(logger, resolvedConfig);
+    return new Preprocessor(logger, project, resolvedConfig);
   }
 }

@@ -1,3 +1,4 @@
 - Extract Markdown builder into its own module
 - Add check for Svelte 4 as peer dependency
 - Add tests
+- Resolve TS types using the type checker from the project

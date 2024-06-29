@@ -1,7 +1,8 @@
 import { InterfaceDeclaration, Project, TypeAliasDeclaration, type SourceFile } from 'ts-morph';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { randomString } from '$lib/utils/index.js';
+import { generateAlphabeat } from '$lib/utils/alphabeat.js';
+import { randomString } from '$lib/utils/strings.js';
 
 import { getInterfaceOrTypeAliasFromSymbolName } from './symbols.js';
 
@@ -10,9 +11,17 @@ let project: Project;
 let sourceFile: SourceFile;
 
 beforeEach(() => {
-  symbol = randomString();
+  symbol = randomString({
+    alphabeat: generateAlphabeat('a', 'z'),
+    length: 16,
+  });
   project = new Project();
-  sourceFile = project.createSourceFile(`${randomString()}.ts`);
+  sourceFile = project.createSourceFile(
+    `${randomString({
+      alphabeat: generateAlphabeat('a', 'z'),
+      length: 16,
+    })}.ts`,
+  );
 });
 
 describe(getInterfaceOrTypeAliasFromSymbolName.name, () => {

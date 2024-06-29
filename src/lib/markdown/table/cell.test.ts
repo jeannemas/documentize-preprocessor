@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import * as Markdown from '$lib/markdown/index.js';
-import { randomString } from '$lib/utils/index.js';
+import { generateAlphabeat } from '$lib/utils/alphabeat.js';
+import { randomString } from '$lib/utils/strings.js';
 
 describe(Markdown.Table.Cell.name, () => {
   describe('constructor', () => {
@@ -24,7 +25,12 @@ describe(Markdown.Table.Cell.name, () => {
     it('Should return the instance', () => {
       // Arrange
       const cell = new Markdown.Table.Cell();
-      const text = new Markdown.Text(randomString());
+      const text = new Markdown.Text(
+        randomString({
+          alphabeat: generateAlphabeat('a', 'z'),
+          length: 16,
+        }),
+      );
 
       // Act
       const maybeCell = cell.add(text);

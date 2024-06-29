@@ -1,4 +1,4 @@
-import { generateAlphabeat, randomInteger } from './index.js';
+import { randomInteger } from './numbers.js';
 
 /**
  * The options for generating a random string.
@@ -6,33 +6,26 @@ import { generateAlphabeat, randomInteger } from './index.js';
 export type RandomStringOptions = {
   /**
    * The alphabeat to use.
-   *
-   * @default 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
    */
-  alphabeat?: string;
+  alphabeat: string[];
   /**
    * The length of the string.
-   *
-   * @default 16
    */
-  length?: number;
+  length: number;
 };
 
 /**
  * Generate a random string.
  *
  * @param options The options.
- * @param options.alphabeat The alphabeat to use. Default is `'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'`.
- * @param options.length The length of the string. Default is `16`.
+ * @param options.alphabeat The alphabeat to use. Default is the pattern from `'a'` to `'z'` and from `'A'` to `'Z'`.
+ * @param options.length The length of the string.
  */
-export function randomString({
-  alphabeat = `${generateAlphabeat('a', 'z')}${generateAlphabeat('A', 'Z')}`,
-  length = 16,
-}: RandomStringOptions = {}): string {
-  const alphabeatChars = [...new Set(alphabeat.split('')).values()]; // Filter out duplicates.
+export function randomString(options: RandomStringOptions): string {
+  const alphabeatChars = [...new Set(options.alphabeat).values()]; // Filter out duplicates.
   const chars: string[] = [];
 
-  for (let i = 0; i <= length; i += 1) {
+  for (let i = 0; i < options.length; i += 1) {
     const charIndex = randomInteger({
       max: alphabeatChars.length,
       min: 0,

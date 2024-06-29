@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import * as Markdown from '$lib/markdown/index.js';
-import { randomString } from '$lib/utils/index.js';
+import { generateAlphabeat } from '$lib/utils/alphabeat.js';
+import { randomString } from '$lib/utils/strings.js';
 
 import { generateRandomHeadingLevel } from './heading.test.js';
 
@@ -28,7 +29,12 @@ describe(Markdown.Section.name, () => {
       // Arrange
       const heading = new Markdown.Heading(generateRandomHeadingLevel());
       const section = new Markdown.Section(heading);
-      const text = new Markdown.Text(randomString());
+      const text = new Markdown.Text(
+        randomString({
+          alphabeat: generateAlphabeat('a', 'z'),
+          length: 16,
+        }),
+      );
 
       // Act
       const maybeSection = section.add(text);

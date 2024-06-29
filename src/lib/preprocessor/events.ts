@@ -1,5 +1,7 @@
 import { InterfaceDeclaration, type TypeAliasDeclaration } from 'ts-morph';
 
+import { extractProperties } from './types.js';
+
 /**
  * A Svelte 4 event.
  */
@@ -25,23 +27,10 @@ export function resolveSvelte4Events(
 ): Svelte4Event[] {
   const events: Svelte4Event[] = [];
 
-  if (interfaceOrTypeAlias instanceof InterfaceDeclaration) {
-    const interfaceDeclaration = interfaceOrTypeAlias;
-    const propertySignatures = interfaceDeclaration.getProperties();
+  for (const property of extractProperties(interfaceOrTypeAlias)) {
+    const event = new Svelte4Event(property.name);
 
-    for (const propertySignature of propertySignatures) {
-      const event = new Svelte4Event(propertySignature.getName());
-
-      events.push(event);
-    }
-  } else {
-    const typeAliasDeclaration = interfaceOrTypeAlias;
-
-    for (const symbol of typeAliasDeclaration.getType().getProperties()) {
-      const event = new Svelte4Event(symbol.getName());
-
-      events.push(event);
-    }
+    events.push(event);
   }
 
   return events;

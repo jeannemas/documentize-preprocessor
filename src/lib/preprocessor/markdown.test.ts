@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { randomInteger, randomString } from '$lib/utils/index.js';
+import { generateAlphabeat } from '$lib/utils/alphabeat.js';
+import { randomInteger } from '$lib/utils/numbers.js';
+import { randomString } from '$lib/utils/strings.js';
 
 import { generateRandomEvents } from './events.test.js';
 import {
@@ -21,8 +23,14 @@ describe(buildMarkdown.name, () => {
   it('Should build the documentation as Markdown of a Svelte 4 component', () => {
     // Arrange
     const metadata = new Svelte4Metadata(
-      randomString(),
-      randomString(),
+      randomString({
+        alphabeat: generateAlphabeat('a', 'z'),
+        length: 16,
+      }),
+      randomString({
+        alphabeat: generateAlphabeat('a', 'z'),
+        length: 16,
+      }),
       generateRandomEvents(
         randomInteger({
           max: 10,
@@ -75,8 +83,14 @@ describe(buildMarkdown.name, () => {
   it('Should build the documentation with no events', () => {
     // Arrange
     const metadata = new Svelte4Metadata(
-      randomString(),
-      randomString(),
+      randomString({
+        alphabeat: generateAlphabeat('a', 'z'),
+        length: 16,
+      }),
+      randomString({
+        alphabeat: generateAlphabeat('a', 'z'),
+        length: 16,
+      }),
       [],
       generateRandomProps(
         randomInteger({
@@ -124,8 +138,14 @@ describe(buildMarkdown.name, () => {
   it('Should build the documentation with no props', () => {
     /// Arrange
     const metadata = new Svelte4Metadata(
-      randomString(),
-      randomString(),
+      randomString({
+        alphabeat: generateAlphabeat('a', 'z'),
+        length: 16,
+      }),
+      randomString({
+        alphabeat: generateAlphabeat('a', 'z'),
+        length: 16,
+      }),
       generateRandomEvents(
         randomInteger({
           max: 10,
@@ -173,8 +193,14 @@ describe(buildMarkdown.name, () => {
   it('Should build the documentation with no slots', () => {
     // Arrange
     const metadata = new Svelte4Metadata(
-      randomString(),
-      randomString(),
+      randomString({
+        alphabeat: generateAlphabeat('a', 'z'),
+        length: 16,
+      }),
+      randomString({
+        alphabeat: generateAlphabeat('a', 'z'),
+        length: 16,
+      }),
       generateRandomEvents(
         randomInteger({
           max: 10,
@@ -215,8 +241,14 @@ describe(buildMarkdown.name, () => {
   it('Should build the documentation with only events', () => {
     // Arrange
     const metadata = new Svelte4Metadata(
-      randomString(),
-      randomString(),
+      randomString({
+        alphabeat: generateAlphabeat('a', 'z'),
+        length: 16,
+      }),
+      randomString({
+        alphabeat: generateAlphabeat('a', 'z'),
+        length: 16,
+      }),
       generateRandomEvents(
         randomInteger({
           max: 10,
@@ -247,8 +279,14 @@ describe(buildMarkdown.name, () => {
   it('Should build the documentation with only props', () => {
     // Arrange
     const metadata = new Svelte4Metadata(
-      randomString(),
-      randomString(),
+      randomString({
+        alphabeat: generateAlphabeat('a', 'z'),
+        length: 16,
+      }),
+      randomString({
+        alphabeat: generateAlphabeat('a', 'z'),
+        length: 16,
+      }),
       [],
       generateRandomProps(
         randomInteger({
@@ -279,8 +317,14 @@ describe(buildMarkdown.name, () => {
   it('Should build the documentation with only slots', () => {
     // Arrange
     const metadata = new Svelte4Metadata(
-      randomString(),
-      randomString(),
+      randomString({
+        alphabeat: generateAlphabeat('a', 'z'),
+        length: 16,
+      }),
+      randomString({
+        alphabeat: generateAlphabeat('a', 'z'),
+        length: 16,
+      }),
       [],
       [],
       generateRandomSlots(
@@ -317,7 +361,19 @@ describe(buildMarkdown.name, () => {
 
   it('Should build the documentation with no events, props, and slots', () => {
     // Arrange
-    const metadata = new Svelte4Metadata(randomString(), randomString(), [], [], []);
+    const metadata = new Svelte4Metadata(
+      randomString({
+        alphabeat: generateAlphabeat('a', 'z'),
+        length: 16,
+      }),
+      randomString({
+        alphabeat: generateAlphabeat('a', 'z'),
+        length: 16,
+      }),
+      [],
+      [],
+      [],
+    );
 
     // Act
     const markdown = buildMarkdown(metadata);

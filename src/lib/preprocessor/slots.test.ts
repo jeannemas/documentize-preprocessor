@@ -6,7 +6,9 @@ import {
 } from 'ts-morph';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { randomInteger, randomString } from '$lib/utils/index.js';
+import { generateAlphabeat } from '$lib/utils/alphabeat.js';
+import { randomInteger } from '$lib/utils/numbers.js';
+import { randomString } from '$lib/utils/strings.js';
 
 import { Svelte4Slot, Svelte4SlotProperty, resolveSvelte4Slots } from './slots.js';
 
@@ -60,7 +62,14 @@ export function generateRandomSlotProperty(propertyCount: number): Svelte4SlotPr
   const properties: Svelte4SlotProperty[] = [];
 
   for (let i = 0; i < propertyCount; i += 1) {
-    properties.push(new Svelte4SlotProperty(randomString()));
+    properties.push(
+      new Svelte4SlotProperty(
+        randomString({
+          alphabeat: generateAlphabeat('a', 'z'),
+          length: 16,
+        }),
+      ),
+    );
   }
 
   return properties;
@@ -70,7 +79,15 @@ export function generateRandomSlots(slotsCount: number, propertyCount: number): 
   const slots: Svelte4Slot[] = [];
 
   for (let i = 0; i < slotsCount; i += 1) {
-    slots.push(new Svelte4Slot(randomString(), generateRandomSlotProperty(propertyCount)));
+    slots.push(
+      new Svelte4Slot(
+        randomString({
+          alphabeat: generateAlphabeat('a', 'z'),
+          length: 16,
+        }),
+        generateRandomSlotProperty(propertyCount),
+      ),
+    );
   }
 
   return slots;
@@ -82,8 +99,16 @@ let sourceFile: SourceFile;
 
 beforeEach(() => {
   project = new Project();
-  slotsSymbol = randomString();
-  sourceFile = project.createSourceFile(`${randomString()}.ts`);
+  slotsSymbol = randomString({
+    alphabeat: generateAlphabeat('a', 'z'),
+    length: 16,
+  });
+  sourceFile = project.createSourceFile(
+    `${randomString({
+      alphabeat: generateAlphabeat('a', 'z'),
+      length: 16,
+    })}.ts`,
+  );
 });
 
 describe(resolveSvelte4Slots.name, () => {

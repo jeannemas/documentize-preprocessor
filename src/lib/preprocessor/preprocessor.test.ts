@@ -1,6 +1,8 @@
+import { Project } from 'ts-morph';
 import { describe, expect, it } from 'vitest';
 
-import { randomString } from '$lib/utils/index.js';
+import { generateAlphabeat } from '$lib/utils/alphabeat.js';
+import { randomString } from '$lib/utils/strings.js';
 
 import { resolveConfig, type Config } from './config.js';
 import { Logger } from './logger.js';
@@ -12,10 +14,11 @@ describe(Preprocessor.name, () => {
   describe(Preprocessor.create.name, () => {
     it('Should create a new preprocessor', () => {
       // Arrange
+      const tsConfigFilePath = undefined;
       const config = {} satisfies Config;
 
       // Act
-      const action = () => Preprocessor.create(config);
+      const action = () => Preprocessor.create(tsConfigFilePath, config);
 
       // Assert
       expect(action).not.toThrowError();
@@ -31,9 +34,10 @@ describe(Preprocessor.name, () => {
       // Arrange
       const resolvedConfig = resolveConfig();
       const logger = new Logger(console, resolvedConfig.debug);
+      const project = new Project();
 
       // Act
-      const action = () => new Preprocessor(logger, resolvedConfig);
+      const action = () => new Preprocessor(logger, project, resolvedConfig);
 
       // Assert
       expect(action).not.toThrowError();
@@ -52,9 +56,13 @@ describe(Preprocessor.name, () => {
       });
       const preprocessor = new Preprocessor(
         new Logger(new SilentLogger(), resolvedConfig.debug),
+        new Project(),
         resolvedConfig,
       );
-      const filename = randomString();
+      const filename = randomString({
+        alphabeat: generateAlphabeat('a', 'z'),
+        length: 16,
+      });
       const content = `
 <script lang="ts">
   type $$Events = {};
@@ -87,9 +95,13 @@ describe(Preprocessor.name, () => {
       const loggerConsole = new SilentLogger();
       const preprocessor = new Preprocessor(
         new Logger(loggerConsole, resolvedConfig.debug),
+        new Project(),
         resolvedConfig,
       );
-      const filename = randomString();
+      const filename = randomString({
+        alphabeat: generateAlphabeat('a', 'z'),
+        length: 16,
+      });
       const content = `
 <meta
   ${resolvedConfig.dataAttributes.global}
@@ -115,9 +127,13 @@ describe(Preprocessor.name, () => {
       const loggerConsole = new SilentLogger();
       const preprocessor = new Preprocessor(
         new Logger(loggerConsole, resolvedConfig.debug),
+        new Project(),
         resolvedConfig,
       );
-      const filename = randomString();
+      const filename = randomString({
+        alphabeat: generateAlphabeat('a', 'z'),
+        length: 16,
+      });
       const content = `
 <meta
  data-not-documentize
@@ -160,9 +176,13 @@ describe(Preprocessor.name, () => {
       const loggerConsole = new SilentLogger();
       const preprocessor = new Preprocessor(
         new Logger(loggerConsole, resolvedConfig.debug),
+        new Project(),
         resolvedConfig,
       );
-      const filename = randomString();
+      const filename = randomString({
+        alphabeat: generateAlphabeat('a', 'z'),
+        length: 16,
+      });
       const content = `
 <meta
   ${resolvedConfig.dataAttributes.global}
@@ -192,9 +212,13 @@ describe(Preprocessor.name, () => {
       const loggerConsole = new SilentLogger();
       const preprocessor = new Preprocessor(
         new Logger(loggerConsole, resolvedConfig.debug),
+        new Project(),
         resolvedConfig,
       );
-      const filename = randomString();
+      const filename = randomString({
+        alphabeat: generateAlphabeat('a', 'z'),
+        length: 16,
+      });
       const content = `
 <meta
   ${resolvedConfig.dataAttributes.global}

@@ -1,4 +1,4 @@
-import { randomInteger } from './index.js';
+import { randomInteger } from './numbers.js';
 
 /**
  * Generate a random boolean.

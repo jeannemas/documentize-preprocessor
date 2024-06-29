@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
 import * as Markdown from '$lib/markdown/index.js';
-import { randomInteger, randomString } from '$lib/utils/index.js';
+import { generateAlphabeat } from '$lib/utils/alphabeat.js';
+import { randomInteger } from '$lib/utils/numbers.js';
+import { randomString } from '$lib/utils/strings.js';
 
 import { generateRandomColumnAlignment } from './column.test.js';
 
@@ -13,7 +15,15 @@ export function generateRandomColumns(columnsCount: number): Markdown.Table.Colu
 
   for (let i = 0; i < columnsCount; i += 1) {
     columns.push(
-      new Markdown.Table.Column(generateRandomColumnAlignment(), new Markdown.Text(randomString())),
+      new Markdown.Table.Column(
+        generateRandomColumnAlignment(),
+        new Markdown.Text(
+          randomString({
+            alphabeat: generateAlphabeat('a', 'z'),
+            length: 16,
+          }),
+        ),
+      ),
     );
   }
 
@@ -30,7 +40,16 @@ export function generateRandomRows(columnsCount: number, rowsCount: number): Mar
     const cells: Markdown.Table.Cell[] = [];
 
     for (let j = 0; j < columnsCount; j += 1) {
-      cells.push(new Markdown.Table.Cell(new Markdown.Text(randomString())));
+      cells.push(
+        new Markdown.Table.Cell(
+          new Markdown.Text(
+            randomString({
+              alphabeat: generateAlphabeat('a', 'z'),
+              length: 16,
+            }),
+          ),
+        ),
+      );
     }
 
     rows.push(new Markdown.Table.Row(...cells));

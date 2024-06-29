@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { randomInteger, randomString } from '$lib/utils/index.js';
+import { generateAlphabeat } from '$lib/utils/alphabeat.js';
+import { randomInteger } from '$lib/utils/numbers.js';
+import { randomString } from '$lib/utils/strings.js';
 
 import { Attribute, parseAttributes } from './attributes.js';
 
@@ -38,8 +40,14 @@ describe(parseAttributes.name, () => {
       { length: attributesCount },
       () =>
         new Attribute(
-          randomString(), // Random name
-          randomString(), // Random value
+          randomString({
+            alphabeat: generateAlphabeat('a', 'z'),
+            length: 16,
+          }), // Random name
+          randomString({
+            alphabeat: generateAlphabeat('a', 'z'),
+            length: 16,
+          }), // Random value
         ),
     );
     const attributesNames = attributes.map(({ name }) => name);
@@ -66,7 +74,14 @@ describe(parseAttributes.name, () => {
     });
     const attributes = Array.from(
       { length: attributesCount },
-      () => new Attribute(randomString(), ''),
+      () =>
+        new Attribute(
+          randomString({
+            alphabeat: generateAlphabeat('a', 'z'),
+            length: 16,
+          }),
+          '',
+        ),
     );
     const attributesNames = attributes.map(({ name }) => name);
     const attributesString = compileAttributesIntoString(attributes);

@@ -12,7 +12,12 @@ describe(generateAlphabeat.name, () => {
     const alphabeat = generateAlphabeat(fromChar, toChar);
 
     // Assert
-    expect(alphabeat).toEqual('abcdefghijklmnopqrstuvwxyz');
+    expect(alphabeat).toBeInstanceOf(Array);
+
+    for (const char of alphabeat) {
+      expect(char).toBeTypeOf('string');
+      expect(char).toHaveLength(1);
+    }
   });
 
   it('Should throw an error if the `fromChar` is not a single character', () => {

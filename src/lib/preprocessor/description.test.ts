@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { randomString } from '$lib/utils/index.js';
+import { generateAlphabeat } from '$lib/utils/alphabeat.js';
+import { randomString } from '$lib/utils/strings.js';
 
 import { Attribute } from './attributes.js';
 import { resolveConfig } from './config.js';
@@ -24,7 +25,10 @@ describe(resolveDescription.name, () => {
     const resolvedConfig = resolveConfig();
     const descriptionAttribute = new Attribute(
       resolvedConfig.dataAttributes.description,
-      randomString(),
+      randomString({
+        alphabeat: generateAlphabeat('a', 'z'),
+        length: 16,
+      }),
     );
     const attributes = [descriptionAttribute] satisfies Attribute[];
 

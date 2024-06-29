@@ -9,7 +9,9 @@ import {
 } from 'ts-morph';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { randomInteger, randomString } from '$lib/utils/index.js';
+import { generateAlphabeat } from '$lib/utils/alphabeat.js';
+import { randomInteger } from '$lib/utils/numbers.js';
+import { randomString } from '$lib/utils/strings.js';
 
 import { Svelte4Event, resolveSvelte4Events } from './events.js';
 
@@ -56,7 +58,17 @@ export function generateRandomEvents(eventsCount: number): Svelte4Event[] {
   const events: Svelte4Event[] = [];
 
   for (let i = 0; i < eventsCount; i += 1) {
-    events.push(new Svelte4Event(randomString()));
+    events.push(
+      new Svelte4Event(
+        randomString({
+          alphabeat: generateAlphabeat('a', 'z'),
+          length: randomInteger({
+            max: 10,
+            min: 1,
+          }),
+        }),
+      ),
+    );
   }
 
   return events;
@@ -69,6 +81,7 @@ export function generateSimpleInterfaceProperties(
 
   for (let propertyIndex = 0; propertyIndex < propertyCount; propertyIndex += 1) {
     const name = randomString({
+      alphabeat: generateAlphabeat('a', 'z'),
       length: randomInteger({
         max: 5,
         min: 1,
@@ -80,7 +93,6 @@ export function generateSimpleInterfaceProperties(
       upperBoundary: 'exclude',
     });
     const type = simpleTypes[typeIndex];
-
     const property = {
       name,
       type,
@@ -100,6 +112,7 @@ export function generateSimpleTypeAlias(propertyCount: number): {
 
   for (let propertyIndex = 0; propertyIndex < propertyCount; propertyIndex += 1) {
     const name = randomString({
+      alphabeat: generateAlphabeat('a', 'z'),
       length: randomInteger({
         max: 5,
         min: 1,
@@ -137,9 +150,17 @@ let project: Project;
 let sourceFile: SourceFile;
 
 beforeEach(() => {
-  eventsSymbol = randomString();
+  eventsSymbol = randomString({
+    alphabeat: generateAlphabeat('a', 'z'),
+    length: 16,
+  });
   project = new Project();
-  sourceFile = project.createSourceFile(`${randomString()}.ts`);
+  sourceFile = project.createSourceFile(
+    `${randomString({
+      alphabeat: generateAlphabeat('a', 'z'),
+      length: 16,
+    })}.ts`,
+  );
 });
 
 describe(resolveSvelte4Events.name, () => {

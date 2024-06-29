@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
 import * as Markdown from '$lib/markdown/index.js';
-import { randomInteger, randomString } from '$lib/utils/index.js';
+import { generateAlphabeat } from '$lib/utils/alphabeat.js';
+import { randomInteger } from '$lib/utils/numbers.js';
+import { randomString } from '$lib/utils/strings.js';
 
 export function generateRandomHeadingLevel(): Markdown.HeadingLevel {
   const index = randomInteger({
@@ -47,7 +49,12 @@ describe(Markdown.Heading.name, () => {
     it('Should return the instance', () => {
       // Arrange
       const heading = new Markdown.Heading(generateRandomHeadingLevel());
-      const text = new Markdown.Text(randomString());
+      const text = new Markdown.Text(
+        randomString({
+          alphabeat: generateAlphabeat('a', 'z'),
+          length: 16,
+        }),
+      );
 
       // Act
       const maybeHeading = heading.add(text);

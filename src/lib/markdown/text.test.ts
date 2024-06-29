@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import * as Markdown from '$lib/markdown/index.js';
-import { randomString } from '$lib/utils/index.js';
+import { generateAlphabeat } from '$lib/utils/alphabeat.js';
+import { randomString } from '$lib/utils/strings.js';
 
 describe(Markdown.Text.name, () => {
   describe('constructor', () => {
@@ -9,7 +10,13 @@ describe(Markdown.Text.name, () => {
       // Arrange
 
       // Act
-      const action = () => new Markdown.Text(randomString());
+      const action = () =>
+        new Markdown.Text(
+          randomString({
+            alphabeat: generateAlphabeat('a', 'z'),
+            length: 16,
+          }),
+        );
 
       // Assert
       expect(action).not.toThrowError();
@@ -23,7 +30,12 @@ describe(Markdown.Text.name, () => {
   describe('asString' satisfies keyof Markdown.Text, () => {
     it('Should return a string', () => {
       // Arrange
-      const text = new Markdown.Text(randomString());
+      const text = new Markdown.Text(
+        randomString({
+          alphabeat: generateAlphabeat('a', 'z'),
+          length: 16,
+        }),
+      );
 
       // Act
       const markdown = text.asString();

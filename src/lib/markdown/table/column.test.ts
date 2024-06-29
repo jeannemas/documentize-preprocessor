@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
 import * as Markdown from '$lib/markdown/index.js';
-import { randomInteger, randomString } from '$lib/utils/index.js';
+import { generateAlphabeat } from '$lib/utils/alphabeat.js';
+import { randomInteger } from '$lib/utils/numbers.js';
+import { randomString } from '$lib/utils/strings.js';
 
 /**
  * Generate a random column alignment.
@@ -51,7 +53,12 @@ describe(Markdown.Table.Column.name, () => {
       // Arrange
       const alignment = generateRandomColumnAlignment();
       const column = new Markdown.Table.Column(alignment);
-      const text = new Markdown.Text(randomString());
+      const text = new Markdown.Text(
+        randomString({
+          alphabeat: generateAlphabeat('a', 'z'),
+          length: 16,
+        }),
+      );
 
       // Act
       const maybeColumn = column.add(text);

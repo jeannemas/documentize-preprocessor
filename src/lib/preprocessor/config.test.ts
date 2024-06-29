@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { randomString } from '$lib/utils/index.js';
+import { generateAlphabeat } from '$lib/utils/alphabeat.js';
+import { randomString } from '$lib/utils/strings.js';
 
 import { Attribute } from './attributes.js';
 import {
@@ -40,9 +41,27 @@ describe(resolveComponentConfig.name, () => {
   it('Should resolve using the provided config', () => {
     // Arrange
     const resolvedConfig = resolveConfig();
-    const eventsAttribute = new Attribute(resolvedConfig.dataAttributes.events, randomString());
-    const propsAttribute = new Attribute(resolvedConfig.dataAttributes.props, randomString());
-    const slotsAttribute = new Attribute(resolvedConfig.dataAttributes.slots, randomString());
+    const eventsAttribute = new Attribute(
+      resolvedConfig.dataAttributes.events,
+      randomString({
+        alphabeat: generateAlphabeat('a', 'z'),
+        length: 16,
+      }),
+    );
+    const propsAttribute = new Attribute(
+      resolvedConfig.dataAttributes.props,
+      randomString({
+        alphabeat: generateAlphabeat('a', 'z'),
+        length: 16,
+      }),
+    );
+    const slotsAttribute = new Attribute(
+      resolvedConfig.dataAttributes.slots,
+      randomString({
+        alphabeat: generateAlphabeat('a', 'z'),
+        length: 16,
+      }),
+    );
     const attributes = [eventsAttribute, propsAttribute, slotsAttribute];
 
     // Act
@@ -86,17 +105,41 @@ describe(resolveConfig.name, () => {
     // Arrange
     const config = {
       dataAttributes: {
-        description: `data-description-${randomString()}`,
-        events: `data-${randomString()}`,
-        global: `data-${randomString()}`,
-        props: `data-${randomString()}`,
-        slots: `data-${randomString()}`,
+        description: `data-description-${randomString({
+          alphabeat: generateAlphabeat('a', 'z'),
+          length: 16,
+        })}`,
+        events: `data-${randomString({
+          alphabeat: generateAlphabeat('a', 'z'),
+          length: 16,
+        })}`,
+        global: `data-${randomString({
+          alphabeat: generateAlphabeat('a', 'z'),
+          length: 16,
+        })}`,
+        props: `data-${randomString({
+          alphabeat: generateAlphabeat('a', 'z'),
+          length: 16,
+        })}`,
+        slots: `data-${randomString({
+          alphabeat: generateAlphabeat('a', 'z'),
+          length: 16,
+        })}`,
       },
       debug: true,
       symbols: {
-        events: randomString(),
-        props: randomString(),
-        slots: randomString(),
+        events: randomString({
+          alphabeat: generateAlphabeat('a', 'z'),
+          length: 16,
+        }),
+        props: randomString({
+          alphabeat: generateAlphabeat('a', 'z'),
+          length: 16,
+        }),
+        slots: randomString({
+          alphabeat: generateAlphabeat('a', 'z'),
+          length: 16,
+        }),
       },
     } satisfies Config;
 
@@ -125,27 +168,42 @@ describe(resolveConfig.name, () => {
     // Arrange
     const configWithInvalidDescriptionDataAttribute = {
       dataAttributes: {
-        description: `invalid-${randomString()}` as DataAttribute,
+        description: `invalid-${randomString({
+          alphabeat: generateAlphabeat('a', 'z'),
+          length: 16,
+        })}` as DataAttribute,
       },
     } satisfies Config;
     const configWithInvalidEventsDataAttribute = {
       dataAttributes: {
-        events: `invalid-${randomString()}` as DataAttribute,
+        events: `invalid-${randomString({
+          alphabeat: generateAlphabeat('a', 'z'),
+          length: 16,
+        })}` as DataAttribute,
       },
     } satisfies Config;
     const configWithInvalidGlobalDataAttribute = {
       dataAttributes: {
-        global: `invalid-${randomString()}` as DataAttribute,
+        global: `invalid-${randomString({
+          alphabeat: generateAlphabeat('a', 'z'),
+          length: 16,
+        })}` as DataAttribute,
       },
     } satisfies Config;
     const configWithInvalidPropsDataAttribute = {
       dataAttributes: {
-        props: `invalid-${randomString()}` as DataAttribute,
+        props: `invalid-${randomString({
+          alphabeat: generateAlphabeat('a', 'z'),
+          length: 16,
+        })}` as DataAttribute,
       },
     } satisfies Config;
     const configWithInvalidSlotsDataAttribute = {
       dataAttributes: {
-        slots: `invalid-${randomString()}` as DataAttribute,
+        slots: `invalid-${randomString({
+          alphabeat: generateAlphabeat('a', 'z'),
+          length: 16,
+        })}` as DataAttribute,
       },
     } satisfies Config;
 
