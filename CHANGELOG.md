@@ -1,5 +1,11 @@
 # @jeanne-mas/documentize-preprocessor
 
+## 0.1.1
+
+### Patch Changes
+
+- e2db129: Removed package.json version fetch from logger
+
 ## 0.1.0
 
 ### Minor Changes
