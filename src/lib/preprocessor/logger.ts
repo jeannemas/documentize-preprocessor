@@ -1,6 +1,5 @@
 import chalk from 'chalk';
 
-import { version } from '$lib/../../package.json';
 import { PREPROCESSOR_NAME } from './constants.js';
 
 export type LoggerConsole = Pick<Console, 'info' | 'warn'>;
@@ -61,6 +60,6 @@ export class Logger<TConsole extends LoggerConsole = LoggerConsole> {
    * Get the name of the preprocessor.
    */
   get #name(): string {
-    return `${PREPROCESSOR_NAME}@${version}`;
+    return `${PREPROCESSOR_NAME}`;
   }
 }
