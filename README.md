@@ -26,14 +26,17 @@ To use the preprocessor, add it to your Svelte configuration file `svelte.config
 > Make sure to add the preprocessor before the `vitePreprocess` preprocessor.
 
 ```javascript
-import documentizePreprocessor from '@jeanne-mas/documentize-preprocessor';
+import DocumentizePreprocessor from '@jeanne-mas/documentize-preprocessor';
 import adapter from '@sveltejs/adapter-auto';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
+import { resolve } from 'node:path';
+
+const tsConfigPath = resolve('.', './tsconfig.json');
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
   preprocess: [
-    documentizePreprocessor({
+    DocumentizePreprocessor.create(tsConfigPath, {
       /* Add configuration here */
     }),
     vitePreprocess(),
@@ -50,7 +53,10 @@ export default config;
 The preprocessor accepts the following configuration options:
 
 ```typescript
-type Config = {
+/**
+ * The configuration of the preprocessor.
+ */
+export type Config = {
   /**
    * The data-attributes of the meta tag that contains the component configuration.
    */
@@ -62,17 +68,17 @@ type Config = {
      */
     description?: DataAttribute;
     /**
-     * The data-attribute of the meta tag used to identify the tag as the configuration for the preprocessor.
-     *
-     * @default "data-documentize"
-     */
-    global?: DataAttribute;
-    /**
      * The data-attribute of the meta tag that contains the symbol of the events.
      *
      * @default "data-symbol-events"
      */
     events?: DataAttribute;
+    /**
+     * The data-attribute of the meta tag used to identify the tag as the configuration for the preprocessor.
+     *
+     * @default "data-documentize"
+     */
+    global?: DataAttribute;
     /**
      * The data-attribute of the meta tag that contains the symbol of the props.
      *
