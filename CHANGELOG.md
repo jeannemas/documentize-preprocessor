@@ -1,5 +1,11 @@
 # @jeanne-mas/documentize-preprocessor
 
+## 0.1.2
+
+### Patch Changes
+
+- d74fd35: Removed private fields in favor of modifier
+
 ## 0.1.1
 
 ### Patch Changes
