@@ -91,6 +91,15 @@ describe(resolveSvelte4Slots.name, () => {
         maybeSlots.find((maybeSlot) => maybeSlot.name === slot.name) ?? null;
 
       expect(matchingMaybeSlot).not.toBeNull();
+      expect(matchingMaybeSlot).toBeInstanceOf(Svelte4Slot);
+      expect(matchingMaybeSlot!.properties).toHaveLength(slot.properties.length);
+
+      for (const maybeProp of matchingMaybeSlot!.properties) {
+        const matchingProp = slot.properties.find((prop) => prop.name === maybeProp.name) ?? null;
+
+        expect(matchingProp).not.toBeNull();
+        expect(matchingProp).toBeInstanceOf(Svelte4SlotProperty);
+      }
     }
 
     for (const maybeSlot of maybeSlots) {
@@ -99,6 +108,16 @@ describe(resolveSvelte4Slots.name, () => {
       const matchingSlot = slots.find((slot) => slot.name === maybeSlot.name) ?? null;
 
       expect(matchingSlot).not.toBeNull();
+      expect(matchingSlot).toBeInstanceOf(Svelte4Slot);
+      expect(matchingSlot!.properties).toHaveLength(maybeSlot.properties.length);
+
+      for (const maybeProp of matchingSlot!.properties) {
+        const matchingProp =
+          maybeSlot.properties.find((prop) => prop.name === maybeProp.name) ?? null;
+
+        expect(matchingProp).not.toBeNull();
+        expect(matchingProp).toBeInstanceOf(Svelte4SlotProperty);
+      }
     }
   });
 

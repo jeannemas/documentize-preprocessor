@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { join } from 'node:path';
 import type { MarkupPreprocessor, PreprocessorGroup, Processed } from 'svelte/compiler';
 import { Project } from 'ts-morph';
@@ -18,6 +19,43 @@ import { Svelte4Prop, resolveSvelte4Props } from './props.js';
 import { extractScriptContextModule, extractScriptNotContextModule } from './scripts.js';
 import { Svelte4Slot, resolveSvelte4Slots } from './slots.js';
 import { getInterfaceOrTypeAliasFromSymbolName } from './symbols.js';
+
+/**
+ * The results of processing a Svelte component.
+ */
+export const processedResultCodes = ['processed', 'skipped'] as const;
+
+/**
+ * The processed result of a Svelte component.
+ */
+export type ProcessedResultCode = (typeof processedResultCodes)[number];
+
+/**
+ * The processed markup of a Svelte component.
+ */
+export class ProcessedMarkup implements Processed {
+  /**
+   * The processed code.
+   */
+  readonly code: string;
+  /**
+   * The result of the processing.
+   */
+  readonly result:
+    | {
+        code: 'processed';
+        metadata: Svelte4Metadata;
+      }
+    | {
+        code: 'skipped';
+        metadata?: never;
+      };
+
+  constructor({ code, result }: Pick<ProcessedMarkup, 'code' | 'result'>) {
+    this.code = code;
+    this.result = result;
+  }
+}
 
 /**
  * The metadata of a Svelte 4 component.
@@ -176,7 +214,7 @@ export class Preprocessor implements PreprocessorGroup {
    */
   extractComponentMetadata(filename: string, content: string, metaTag: MetaTag): Svelte4Metadata {
     const sourceFile = this.#project.createSourceFile(
-      join(filename, `${Date.now()}.ts`), // We need to provide a unique filename to avoid race conflicts.
+      join(filename, `${randomUUID()}_${Date.now()}.ts`), // We need to provide a unique filename to avoid race conflicts.
       `
 ${extractScriptContextModule(content)?.content ?? ''}
 ${extractScriptNotContextModule(content)?.content ?? ''}
@@ -251,27 +289,29 @@ ${extractScriptNotContextModule(content)?.content ?? ''}
   /**
    * Process the markup of a Svelte component.
    */
-  markup({ content, filename = '' }: Parameters<MarkupPreprocessor>[0]): Processed | void {
+  markup({ content, filename = '' }: Parameters<MarkupPreprocessor>[0]): ProcessedMarkup {
     const metaTag = extractMetaTag(content, this.#resolvedConfig.dataAttributes.global);
 
     if (!metaTag) {
       // The component does not have any meta tag, so we can't generate any documentation.
-      return;
+      return new ProcessedMarkup({
+        code: content,
+        result: {
+          code: 'skipped',
+        },
+      });
     }
-
-    const resolvedComponentConfig = resolveComponentConfig(
-      metaTag.attributes,
-      this.#resolvedConfig,
-    );
-
-    this.#logger.info(`Patching '${filename}' based on provided config`, resolvedComponentConfig);
 
     const metadata = this.extractComponentMetadata(filename, content, metaTag);
     const newCode = this.patchContent(content, metaTag.regex, metadata);
 
-    return {
+    return new ProcessedMarkup({
       code: newCode,
-    };
+      result: {
+        code: 'processed',
+        metadata,
+      },
+    });
   }
 
   /**

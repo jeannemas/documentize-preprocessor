@@ -51,14 +51,25 @@ export function resolveSvelte4Slots(
   const type = interfaceOrTypeAlias.getType();
 
   for (const property of extractProperties(type)) {
+    const properties: Svelte4SlotProperty[] = [];
+    const symbol = type.getPropertyOrThrow(property.name);
+
+    for (const declaration of symbol.getDeclarations()) {
+      const declarationType = declaration.getType();
+
+      properties.push(
+        ...extractProperties(declarationType).map(
+          (prop) =>
+            new Svelte4SlotProperty({
+              name: prop.name,
+            }),
+        ),
+      );
+    }
+
     const slot = new Svelte4Slot({
       name: property.name,
-      properties: extractProperties(type.getPropertyOrThrow(property.name).getDeclaredType()).map(
-        (prop) =>
-          new Svelte4SlotProperty({
-            name: prop.name,
-          }),
-      ),
+      properties,
     });
 
     slots.push(slot);
