@@ -1,5 +1,11 @@
 # @jeanne-mas/documentize-preprocessor
 
+## 0.2.0
+
+### Minor Changes
+
+- 14c0d03: Changed preprocessor from class to object
+
 ## 0.1.2
 
 ### Patch Changes
