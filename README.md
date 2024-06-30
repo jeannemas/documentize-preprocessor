@@ -26,7 +26,7 @@ To use the preprocessor, add it to your Svelte configuration file `svelte.config
 > Make sure to add the preprocessor before the `vitePreprocess` preprocessor.
 
 ```javascript
-import DocumentizePreprocessor from '@jeanne-mas/documentize-preprocessor';
+import documentizePreprocessor from '@jeanne-mas/documentize-preprocessor';
 import adapter from '@sveltejs/adapter-auto';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 import { resolve } from 'node:path';
@@ -36,7 +36,7 @@ const tsConfigPath = resolve('.', './tsconfig.json');
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
   preprocess: [
-    DocumentizePreprocessor.create(tsConfigPath, {
+    documentizePreprocessor(tsConfigPath, {
       /* Add configuration here */
     }),
     vitePreprocess(),

@@ -1,1 +1,1 @@
-export { Preprocessor as default } from './preprocessor.js';
+export { default } from './preprocessor.js';
