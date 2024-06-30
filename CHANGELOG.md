@@ -1,5 +1,11 @@
 # @jeanne-mas/documentize-preprocessor
 
+## 0.2.1
+
+### Patch Changes
+
+- a063b30: Removed unused chalk dependency
+
 ## 0.2.0
 
 ### Minor Changes
