@@ -11,11 +11,11 @@ export class Logger<TConsole extends LoggerConsole = LoggerConsole> {
   /**
    * The console to log to.
    */
-  private readonly _console: TConsole;
+  #console: TConsole;
   /**
    * Whether the logger is in debug mode.
    */
-  private readonly _debug: boolean;
+  #debug: boolean;
 
   /**
    * Create a new logger.
@@ -24,8 +24,8 @@ export class Logger<TConsole extends LoggerConsole = LoggerConsole> {
    * @param debug Whether the logger is in debug mode.
    */
   constructor(console: TConsole, debug: boolean) {
-    this._console = console;
-    this._debug = debug;
+    this.#console = console;
+    this.#debug = debug;
   }
 
   /**
@@ -34,12 +34,12 @@ export class Logger<TConsole extends LoggerConsole = LoggerConsole> {
    * If the logger is not in debug mode, this method does nothing.
    */
   info(...args: unknown[]): void {
-    if (!this._debug) {
+    if (!this.#debug) {
       // We only want to log in debug mode
       return;
     }
 
-    this._console.info(`[${chalk.bgBlue(PREPROCESSOR_NAME)}]`, ...args);
+    this.#console.info(`[${chalk.bgBlue(this.#name)}]`, ...args);
   }
 
   /**
@@ -48,11 +48,18 @@ export class Logger<TConsole extends LoggerConsole = LoggerConsole> {
    * If the logger is not in debug mode, this method does nothing.
    */
   warn(...args: unknown[]): void {
-    if (!this._debug) {
+    if (!this.#debug) {
       // We only want to log in debug mode
       return;
     }
 
-    this._console.warn(`[${chalk.bgYellow(PREPROCESSOR_NAME)}]`, ...args);
+    this.#console.warn(`[${chalk.bgYellow(this.#name)}]`, ...args);
+  }
+
+  /**
+   * Get the name of the preprocessor.
+   */
+  get #name(): string {
+    return `${PREPROCESSOR_NAME}`;
   }
 }

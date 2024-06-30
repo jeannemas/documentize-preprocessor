@@ -186,15 +186,15 @@ export class Preprocessor implements PreprocessorGroup {
   /**
    * The logger for the preprocessor.
    */
-  private readonly _logger: Logger;
+  #logger: Logger;
   /**
    * The project for the preprocessor.
    */
-  private readonly _project: Project;
+  #project: Project;
   /**
    * The resolved configuration for the preprocessor.
    */
-  private readonly _resolvedConfig: ResolvedConfig;
+  #resolvedConfig: ResolvedConfig;
 
   readonly name = PREPROCESSOR_NAME;
 
@@ -202,9 +202,9 @@ export class Preprocessor implements PreprocessorGroup {
    * Create a new preprocessor.
    */
   constructor(logger: Logger, project: Project, resolvedConfig: ResolvedConfig) {
-    this._logger = logger;
-    this._project = project;
-    this._resolvedConfig = resolvedConfig;
+    this.#logger = logger;
+    this.#project = project;
+    this.#resolvedConfig = resolvedConfig;
 
     logger.info('Global config', resolvedConfig);
   }
@@ -213,7 +213,7 @@ export class Preprocessor implements PreprocessorGroup {
    * Extract the metadata from the Svelte component.
    */
   extractComponentMetadata(filename: string, content: string, metaTag: MetaTag): Svelte4Metadata {
-    const sourceFile = this._project.createSourceFile(
+    const sourceFile = this.#project.createSourceFile(
       join(filename, `${randomUUID()}_${Date.now()}.ts`), // We need to provide a unique filename to avoid race conflicts.
       `
 ${extractScriptContextModule(content)?.content ?? ''}
@@ -222,10 +222,10 @@ ${extractScriptNotContextModule(content)?.content ?? ''}
     );
     const resolvedComponentConfig = resolveComponentConfig(
       metaTag.attributes,
-      this._resolvedConfig,
+      this.#resolvedConfig,
     );
 
-    this._logger.info(`Patching '${filename}' based on provided config`, resolvedComponentConfig);
+    this.#logger.info(`Patching '${filename}' based on provided config`, resolvedComponentConfig);
 
     const eventsNode = getInterfaceOrTypeAliasFromSymbolName(
       resolvedComponentConfig.events,
@@ -239,7 +239,7 @@ ${extractScriptNotContextModule(content)?.content ?? ''}
       resolvedComponentConfig.slots,
       sourceFile,
     );
-    const description = resolveDescription(metaTag.attributes, this._resolvedConfig);
+    const description = resolveDescription(metaTag.attributes, this.#resolvedConfig);
     const events = eventsNode ? resolveSvelte4Events(eventsNode) : [];
     const props = propsNode ? resolveSvelte4Props(propsNode) : [];
     const slots = slotsNode ? resolveSvelte4Slots(slotsNode) : [];
@@ -252,33 +252,33 @@ ${extractScriptNotContextModule(content)?.content ?? ''}
     });
 
     if (!eventsNode) {
-      this._logger.warn(
+      this.#logger.warn(
         `Failed to resolve events for symbol '${resolvedComponentConfig.events}' inside '${filename}'`,
       );
     }
 
     if (!propsNode) {
-      this._logger.warn(
+      this.#logger.warn(
         `Failed to resolve props for symbol '${resolvedComponentConfig.props}' inside '${filename}'`,
       );
     }
 
     if (!slotsNode) {
-      this._logger.warn(
+      this.#logger.warn(
         `Failed to resolve slots for symbol '${resolvedComponentConfig.slots}' inside '${filename}'`,
       );
     }
 
-    this._logger.info('Resolved description', description);
-    this._logger.info(
+    this.#logger.info('Resolved description', description);
+    this.#logger.info(
       `Resolved Svelte 4 events from symbol '${resolvedComponentConfig.events}'`,
       events,
     );
-    this._logger.info(
+    this.#logger.info(
       `Resolved Svelte 4 props from symbol '${resolvedComponentConfig.props}'`,
       props,
     );
-    this._logger.info(
+    this.#logger.info(
       `Resolved Svelte 4 slots from symbol '${resolvedComponentConfig.slots}'`,
       slots,
     );
@@ -290,7 +290,7 @@ ${extractScriptNotContextModule(content)?.content ?? ''}
    * Process the markup of a Svelte component.
    */
   markup({ content, filename = '' }: Parameters<MarkupPreprocessor>[0]): ProcessedMarkup {
-    const metaTag = extractMetaTag(content, this._resolvedConfig.dataAttributes.global);
+    const metaTag = extractMetaTag(content, this.#resolvedConfig.dataAttributes.global);
 
     if (!metaTag) {
       // The component does not have any meta tag, so we can't generate any documentation.
@@ -324,7 +324,7 @@ ${extractScriptNotContextModule(content)?.content ?? ''}
     const patchIsSuccessful = newCode.includes(comment);
 
     if (!patchIsSuccessful) {
-      this._logger.warn(`Failed to patch ${metadata.filename}`);
+      this.#logger.warn(`Failed to patch ${metadata.filename}`);
 
       return content;
     }

@@ -7,23 +7,23 @@ import { randomString } from '$lib/utils/strings.js';
 import { Logger, type LoggerConsole } from './logger.js';
 
 export class SilentLogger implements LoggerConsole {
-  private readonly _infoLogs: unknown[][] = [];
-  private readonly _warnLogs: unknown[][] = [];
+  #infoLogs: unknown[][] = [];
+  #warnLogs: unknown[][] = [];
 
   get infoLogs(): readonly unknown[][] {
-    return this._infoLogs;
+    return this.#infoLogs;
   }
 
   get warnLogs(): readonly unknown[][] {
-    return this._warnLogs;
+    return this.#warnLogs;
   }
 
   info(...args: Parameters<LoggerConsole['info']>) {
-    this._infoLogs.push(args);
+    this.#infoLogs.push(args);
   }
 
   warn(...args: Parameters<LoggerConsole['warn']>) {
-    this._warnLogs.push(args);
+    this.#warnLogs.push(args);
   }
 }
 

@@ -9,11 +9,11 @@ export class Table extends MarkdownNode {
   /**
    * The columns of the table.
    */
-  private readonly _columns: Markdown.Table.Column[];
+  #columns: Markdown.Table.Column[];
   /**
    * The rows of the table.
    */
-  private readonly _rows: Markdown.Table.Row[];
+  #rows: Markdown.Table.Row[];
 
   /**
    * Create a new table.
@@ -21,16 +21,16 @@ export class Table extends MarkdownNode {
   constructor(columns: Markdown.Table.Column[], rows: Markdown.Table.Row[]) {
     super();
 
-    this._columns = columns;
-    this._rows = rows;
+    this.#columns = columns;
+    this.#rows = rows;
   }
 
   /**
    * Convert the table to a string.
    */
   override asString(): string {
-    const columns = this._columns;
-    const rows = this._rows;
+    const columns = this.#columns;
+    const rows = this.#rows;
     const lines: string[] = [];
 
     lines.push(
