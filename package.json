@@ -5,7 +5,6 @@
     "url": "https://jeannemas.me"
   },
   "dependencies": {
-    "chalk": "^5.3.0",
     "ts-morph": "^22.0.0"
   },
   "description": "",
